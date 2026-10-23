@@ -1,0 +1,104 @@
+ASSISTENTE IA MAC 1.0
+Seus projetos com Codex ou Claude Code, em um menu simples.
+
+COMECE EM 4 PASSOS
+
+1. Descompacte o ZIP e deixe a pasta inteira junta (inclusive lib/).
+2. Dê dois cliques em ASSISTENTE-IA-MAC.command. Ele abre no Terminal.
+3. Menu 5: crie um projeto ou abra uma pasta que você já tem.
+4. Menu 2 abre uma conversa nova. Menu 1 (ou só Enter) continua de onde parou.
+
+O MENU PRINCIPAL
+
+  Painel no topo: projeto, pasta, ferramenta, RTK e "Conversa" (leve / longa).
+  1) Continuar de onde parei      Enter faz o mesmo, com um projeto aberto
+  2) Começar uma conversa nova    use "Continuar o trabalho" para retomar com resumo
+  3) Encerrar com resumo          guarda o andamento em DOCS/ANDAMENTO.md
+  4) Painel de uso dos projetos   mostra quando vale encerrar cada conversa
+  5) Projetos                     criar, abrir uma pasta, recentes
+  6) Cuidar do projeto            instruções, prompts, anexos, verificar a pasta
+  7) Ajuda e ajustes              1 Contas · 2 RTK · 3 Dicas · 4 Preferências
+                                  5 Instalação · 6 Guia · 7 Aviso dentro do chat
+  8) Escolher uma conversa antiga lista oficial da ferramenta (Codex ou Claude)
+
+  Abrir conversa nova tem "Passo 1 de 4" até "Passo 4 de 4". Na 1ª conversa
+  do projeto o kit usa modelo e esforço padrão e só pergunta "Ajustar modelo
+  e esforço? [s/N]". Projeto novo, sem andamento, começa por "Escrever um
+  pedido novo"; com andamento, o padrão é "Continuar o trabalho".
+
+ONDE FICA CADA COISA (em cada projeto)
+
+  INSTRUCOES/PROJETO.md  regras do projeto; o agente lê em TODA conversa
+  PROMPTS/               pedidos prontos; só o que você escolher é enviado
+  DOCS/                  briefings e andamento; lidos só quando você pedir
+  ANEXOS/                imagens e arquivos de apoio
+  AGENTS.md (Codex) ou CLAUDE.md (Claude) manda o agente ler PROJETO.md.
+  Não apague nem renomeie esse arquivo de entrada.
+
+  Código pode ficar na raiz, em CODIGO/ ou em CODIGO/nome-do-app/.
+  Git (6 → 5) encontra os repositórios; servidor (6 → 8) mostra o pacote
+  encontrado e deixa escolher quando houver mais de um.
+
+ATALHOS OPCIONAIS NO CHAT
+
+  Menu 6 → 9 → 4: ativa atalhos só neste projeto, preservando seus arquivos.
+  Claude Code: /encerrar e /resumo (.claude/commands/).
+  Codex: $encerrar e $resumo (.agents/skills/).
+  Os atalhos usam os prompts de PROMPTS/. Abra uma nova sessão para conferir.
+  Ao organizar para Claude (6 → 11), sua pasta .claude/ real é preservada.
+
+COMO SABER QUANDO ENCERRAR
+
+  • Linha "Conversa" no topo do menu: leve, ficando longa ou muito longa.
+  • Menu 4: todos os projetos, do mais pesado ao mais leve.
+  • No Claude Code: menu 7 → 7 instala uma barra no rodapé do chat com o uso
+    do contexto (opcional; pede prévia, confirmação e faz backup). No chat,
+    /context mostra o uso e /compact resume sem sair.
+  • O Codex não tem barra equivalente conhecida: use o menu 4 e /status.
+  Hora de encerrar? Menu 3. Depois, menu 2 → "Continuar o trabalho".
+  Se você escolher Continuar (1) com a conversa muito longa, o kit pergunta
+  "Encerrar com resumo primeiro? [S/n]".
+
+ECONOMIA DE TOKENS
+
+  Uma conversa por tarefa. Peça trechos ou diffs, não arquivos inteiros.
+  Cite o caminho do arquivo. Use Planejar antes de mudanças grandes.
+  Mantenha PROJETO.md curto e DOCS/ANDAMENTO.md com poucas linhas.
+  Cada projeto novo já traz a seção "Eficiência" e os prompts
+  ENCERRAR-SESSAO e RESUMO-RAPIDO. Mais dicas: menu 7 → 3.
+
+CONTROLE TOTAL
+
+  Menu 7 → 4 liga ou desliga: conferir RTK ao abrir, dica ao abrir, "Medir o
+  uso da conversa e avisar quando estiver longa" (desligado, some a medição
+  no painel, no menu 4 e no aviso), Enter = continuar e "Verificar 1x por
+  dia se há RTK novo" (só consulta; nunca instala sozinho). A opção 6 dessa tela
+  explica o que o kit grava, lê (inclui tokens e contagem de mensagens nas
+  sessões) e nunca faz. Nada global muda sem você.
+  RTK: ao abrir uma conversa o kit só pergunta [S/n] (Enter = ativar; n
+  desliga e não pergunta mais). Menu 7 → 2 gerencia o RTK.
+  Atualização do RTK: o kit confere 1x por dia, em segundo plano, se saiu
+  versão nova. Se saiu, o painel mostra "Atualização: RTK vX.Y.Z disponível".
+  Para instalar: menu 7 → 2 → 10 (pede ATUALIZAR; usa o mesmo método da
+  instalação: instalador oficial da versão publicada ou Homebrew).
+
+SE O MAC NÃO ABRIR O ARQUIVO
+
+  Terminal: digite /bin/bash, um espaço, arraste o .command para a janela e
+  aperte Enter. Para habilitar os dois cliques: chmod u+x, espaço, arraste o
+  arquivo, Enter (sem sudo). Se abrir no TextEdit: Abrir com > Terminal. Se o
+  macOS bloquear: Ajustes do Sistema > Privacidade e Segurança.
+
+LIMITES, SEM ROMANCE
+
+  • O login é feito pela CLI oficial; o kit não pede nem guarda senha.
+  • As medidas de "Conversa" são estimativas quando a barra do Claude não está
+    instalada. Com a barra, o número vale só se o registro for tão recente
+    quanto a conversa. A barra é instalada só com INSTALAR, após validar o
+    JSON e fazer backup; o kit edita só a chave statusLine do settings.json.
+  • Os testes usaram Codex, Claude e RTK simulados, não o seu login real.
+  • As pastas organizam o trabalho; não são isolamento de segurança.
+
+Guia completo: GUIA-DE-USO.md · RTK: RTK.md · Testes: MUDANCAS-E-TESTES.md
+Esta é a versão 1.0, com as melhorias das revisões. Seus projetos atuais
+não precisam ser recriados.
