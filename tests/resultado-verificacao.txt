@@ -1,0 +1,94 @@
+Verificação consolidada — Assistente IA Mac 1.0 — 23/10/2026
+
+$ /bin/bash --version
+exit=0, duração=0.003s
+
+GNU bash, version 3.2.57(1)-release (arm64-apple-darwin26)
+Copyright (C) 2007 Free Software Foundation, Inc.
+
+$ /bin/bash -n ./ASSISTENTE-IA-MAC.command
+exit=0, duração=0.005s
+
+
+$ /bin/bash -n ./lib/dicas.sh
+exit=0, duração=0.003s
+
+
+$ /bin/bash -n ./lib/painel.sh
+exit=0, duração=0.004s
+
+
+$ /bin/bash -n ./lib/projects.sh
+exit=0, duração=0.004s
+
+
+$ /bin/bash -n ./lib/rtk.sh
+exit=0, duração=0.003s
+
+
+$ /bin/bash -n ./lib/statusline-claude.sh
+exit=0, duração=0.003s
+
+
+$ /bin/bash -n ./lib/statusline.sh
+exit=0, duração=0.003s
+
+
+$ /bin/bash -n ./tests/test_rtk.sh
+exit=0, duração=0.003s
+
+
+$ ./ASSISTENTE-IA-MAC.command --check
+exit=0, duração=0.24s
+
+Kit completo. Sintaxe Bash verificada.
+
+$ /Library/Developer/CommandLineTools/usr/bin/python3 -I -m unittest discover -s tests -p test_*.py -v
+exit=0, duração=47.825s
+
+
+----------------------------------------------------------------------
+Ran 327 tests in 47.668s
+
+OK
+
+$ /bin/bash ./tests/test_rtk.sh
+exit=0, duração=8.479s
+
+PASS Entender: options refer to this RTK menu
+PASS Entender: no proxy jargon
+PASS Entender: no ambiguous menu 7/8/9
+
+115 PASS; 0 FAIL
+
+
+Validação de skills e Git real
+codex: 0
+Criado .agents/skills/encerrar/SKILL.md.
+Criado .agents/skills/resumo/SKILL.md.
+Abra uma nova sessão do Codex neste projeto; use $encerrar ou $resumo.
+
+quick_validate encerrar: 0 Skill is valid!
+
+quick_validate resumo: 0 Skill is valid!
+
+claude: 0
+Criado .claude/commands/encerrar.md.
+Criado .claude/commands/resumo.md.
+Abra uma nova sessão do Claude Code neste projeto; use /encerrar ou /resumo se o atalho estiver disponível.
+
+Claude: 2 referências apontam para prompts existentes.
+Git real: 0
+Repositório: CODIGO/App ação
+## No commits yet on master
+?? exemplo.txt
+
+Git real raiz prioritária: 0
+## No commits yet on master
+?? .agents/
+?? .assistente-ia/
+?? AGENTS.md
+?? CODIGO/
+?? DOCS/
+?? INSTRUCOES/
+?? PROMPTS/

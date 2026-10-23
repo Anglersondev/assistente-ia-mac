@@ -1,0 +1,158 @@
+$ /bin/bash tests/test_rtk.sh
+Digite ATIVAR para aplicar esta alteração global: PASS Codex activation flags
+PASS Codex preview before application
+PASS Codex status consulted after application
+PASS Codex verification does not use Claude status
+Digite ATIVAR para aplicar esta alteração global: PASS Claude activation flags
+PASS Claude status consulted after application
+PASS Claude activation does not use Codex flag
+Digite DESATIVAR para aplicar esta alteração global: PASS Codex deactivation flags
+PASS Codex deactivation preview
+Digite DESATIVAR para aplicar esta alteração global: PASS Claude deactivation flags
+Digite ATIVAR para aplicar esta alteração global: PASS Cancellation never applies integration
+Digite ATIVAR para aplicar esta alteração global: PASS EOF never applies integration
+PASS Failed preview aborts action
+PASS Failed preview never applies
+PASS Missing Codex flag aborts action
+PASS Missing flag never applies
+PASS Similar flag name cannot impersonate Codex support
+PASS Similar flag never applies
+PASS Wrong binary or failed gain aborts action
+PASS Failed identity never applies
+Digite ATIVAR para aplicar esta alteração global: PASS RTK application failure is propagated
+PASS Unknown tool rejected
+PASS Easy gains command succeeds
+PASS Easy gains command queries dashboard
+PASS Easy gains does not query or alter hooks
+Digite DESATIVAR para aplicar esta alteração global: PASS CLI deactivation dispatches to selected agent
+PASS Unexpected CLI argument rejected
+PASS Unexpected CLI argument executes nothing
+PASS CLI requires an agent for changes
+PASS Status succeeds for selected project
+PASS Status inspects selected project hooks
+PASS Status inspects selected project Codex hooks
+PASS Status queries Codex explicitly
+PASS Status queries Claude separately
+PASS Status preserves launcher directory
+PASS Status failure propagates
+PASS Codex status failure propagates
+PASS Claude queried even when Codex status fails
+PASS Unsupported Codex query reports partial status
+PASS Unsupported Codex query is not executed
+PASS Claude status remains available on old RTK
+PASS Unavailable gains reports partial status
+PASS Unavailable gains still consults Codex
+PASS Unavailable gains still consults Claude
+PASS Missing RTK returns useful failure
+PASS Missing RTK never invokes a command
+PASS Existing RTK causes no download
+PASS Existing installation target blocks overwrite
+PASS Existing installation target prevents download
+Escolha [1]: Digite INSTALAR para baixar e executar o instalador oficial: PASS Canceled native install has no curl calls
+Escolha [1]: Digite INSTALAR para baixar e executar o instalador oficial: PASS Download failure propagated
+PASS Download failure has no installer execution
+Escolha [1]: Digite INSTALAR para baixar e executar o instalador oficial: PASS Fake native installation completes
+PASS Native installer receives forced checksum and OSS environment
+PASS Installation does not activate Codex integration
+PASS Installation does not activate Claude integration
+PASS History queries recent RTK commands
+PASS History never changes hook configuration
+PASS Rewrite verification queries only the parser
+PASS Rewrite verification does not execute git
+PASS Rewrite verification does not change hooks
+Monitor simulado
+PASS Monitor uses official watch flag
+PASS Monitor does not touch hook config
+PASS Monitor rejects arbitrary extra args
+PASS Invalid monitor args execute nothing
+PASS Verification fails when RTK missing
+PASS Missing RTK executes nothing for verification
+PASS Claude hook inactive without file
+PASS Claude hook active when configured
+PASS Codex hook active when configured
+PASS Unknown tool is never active
+PASS Codex hook inactive without rtk entry
+PASS Hook check prints nothing
+PASS Symlinked hook file (dotfiles) is recognised read-only
+PASS State line active
+PASS State line installed but inactive
+PASS State line not installed
+PASS Autostart active shows active
+PASS Autostart active applies nothing
+PASS Autostart without RTK points to Ajuda e ajustes → RTK (menu 7 → 2)
+PASS Autostart without RTK runs nothing
+PASS Marker file created
+PASS State line off by choice
+PASS Autostart respects marker
+PASS Autostart with marker applies nothing
+PASS Marker removed
+PASS Autostart Enter activates (confirmed, no token)
+PASS Autostart previews silently before applying
+PASS Autostart activation leaves no off marker
+PASS Autostart answer n applies nothing
+PASS Autostart answer n creates marker
+PASS Autostart never fails the launch
+PASS Failed autostart creates no off marker
+Digite DESATIVAR para aplicar esta alteração global: PASS Deactivation creates marker
+Digite ATIVAR para aplicar esta alteração global: PASS Activation removes marker
+Digite DESATIVAR para aplicar esta alteração global: PASS Cancelled deactivation creates no marker
+PASS Confirmed toggle applies without token
+PASS Confirmed toggle still previews first
+PASS Confirmed toggle aborts on failed preview
+PASS Autostart unrecognised answer '0' applies nothing
+PASS Autostart unrecognised answer '0' creates no marker
+PASS Autostart unrecognised answer 'x' applies nothing
+PASS Autostart unrecognised answer 'x' creates no marker
+PASS Autostart unrecognised answer 'talvez' applies nothing
+PASS Autostart unrecognised answer 'talvez' creates no marker
+PASS Menu has plain option 2
+PASS Menu has plain option 9
+PASS Menu points to Preferências, not option 4
+PASS Menu no longer says Desligue em 4
+PASS Menu has no hook jargon in options
+PASS Menu labels are not duplicated (Codex: RTK:)
+PASS Menu agent line has plain label
+PASS Entender: options refer to this RTK menu
+PASS Entender: no proxy jargon
+PASS Entender: no ambiguous menu 7/8/9
+PASS Newer patch detected
+PASS Numeric (not text) comparison
+PASS Same version is not newer
+PASS Older version is not newer
+PASS Invalid tag rejected: v1.0
+PASS Invalid tag rejected: 1.0.1
+PASS Invalid tag rejected: v1.0.1;x
+PASS Invalid tag rejected: v1.0.1 
+PASS Invalid tag rejected: $(x)
+PASS Invalid tag rejected: v99999.0.0
+PASS Latest tag read from release redirect
+PASS Malformed redirect is refused
+PASS Installed version parsed
+Escolha [1]: Digite INSTALAR para baixar e executar o instalador oficial: PASS Installer downloaded from release tag
+PASS Installer never downloaded from master
+PASS Up-to-date: update succeeds
+PASS Up-to-date: nothing installed
+Digite ATUALIZAR para continuar: PASS Update canceled installs nothing
+Digite ATUALIZAR para continuar: PASS Native update succeeds
+PASS Native update pins the new version
+PASS Native update keeps checksum forced
+PASS Update clears the version cache
+Digite ATUALIZAR para continuar: PASS Homebrew install updated with brew upgrade
+PASS Homebrew update skips official installer
+PASS Unknown install method refuses to overwrite
+PASS Unknown install method downloads no installer
+PASS Offline update fails without installing
+PASS Offline update runs nothing
+PASS Daily check stores the result
+PASS Fresh cache skips another check
+PASS Panel notice shows new version
+PASS Notice names both versions and the menu path
+PASS Preference off hides the notice
+PASS Old cache is stale
+PASS Corrupt cache is ignored
+PASS Same version shows no notice
+PASS Background check disabled in test mode
+PASS Menu offers option 10 to update
+PASS rtk_command atualizar routes to rtk_update
+
+154 PASS; 0 FAIL
