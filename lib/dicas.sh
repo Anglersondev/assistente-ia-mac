@@ -22,6 +22,25 @@ TIPS=(
   'Antes de encerrar uma conversa longa, use Encerrar com resumo (menu 3) e comece a próxima com Continuar o trabalho.'
   'No Claude Code, /context mostra quanto da conversa já foi usado; você também pode pedir ao Claude um /statusline para ver esse uso na barra.'
 )
+TIPS_EN=(
+  'Start a new conversation for each task; long conversations cost more with each request.'
+  'In Claude Code, /compact summarizes the conversation and frees context space.'
+  'In Claude Code, /clear resets the conversation. In Codex, start a new one.'
+  'Search before opening whole files; reading just the relevant part costs less.'
+  'Provide the exact file path and excerpt so the agent can find it quickly.'
+  'Use Plan mode before large changes; fixing a plan costs less than fixing code.'
+  'Simple tasks do not need maximum reasoning; choose a lower effort level.'
+  'Keep INSTRUCOES/PROJETO.md short; the agent reads it in every conversation.'
+  'Store recurring requests in PROMPTS/ and choose one for each task.'
+  'Record decisions and next steps in DOCS/ANDAMENTO.md for easier handoff.'
+  'RTK shortens command output so less text enters the conversation.'
+  'Use /model to switch to a smaller model for simple tasks.'
+  'Attach only the relevant screenshot area or log excerpt.'
+  'Ask for a short answer or just the diff when a long explanation is unnecessary.'
+  'Ask the agent to run tests and show only failures for concise output.'
+  'Before ending a long conversation, use Wrap up with a summary (menu 3).'
+  'In Claude Code, /context shows context usage; /statusline can also show it.'
+)
 
 tip_of_the_day() {
   local day count index
@@ -29,11 +48,47 @@ tip_of_the_day() {
   case "$day" in ''|*[!0-9]*) day=1 ;; esac
   count="${#TIPS[@]}"
   index=$(( 10#$day % count ))
-  say "Dica: ${TIPS[$index]}"
+  if [ "$APP_LANG" = en ]; then say "Tip: ${TIPS_EN[$index]}"
+  else say "Dica: ${TIPS[$index]}"; fi
   return 0
 }
 
 tips_menu() {
+  if [ "$APP_LANG" = en ]; then
+    header 'Tips for better results with less effort'
+    say 'EFFICIENCY'
+    say '  • Start a new conversation for each task; long conversations cost more.'
+    say '  • Give exact file paths and ask for a search before opening whole files.'
+    say '  • Attach only relevant excerpts and ask for short answers or a diff.'
+    say '  • Use lower reasoning effort and a smaller model for simple tasks.'
+    say '  • RTK (Help and settings → 2) shortens command output. The kit asks'
+    say '    whether to enable it when opening a conversation (Enter = yes).'
+    say ''
+    say 'QUALITY'
+    say '  • Use Plan mode before large changes, then request implementation.'
+    say '  • State the expected result and how to tell when it is done.'
+    say '  • Ask the agent to run tests and verify the actual result.'
+    say '  • Larger models and higher effort help with hard problems, not tiny edits.'
+    say ''
+    say 'LONG CONVERSATIONS'
+    say '  • Warning signs: slow replies, forgotten decisions, repeated questions.'
+    say '  • In Claude Code, /compact summarizes and continues; /clear restarts.'
+    say '  • To switch conversations without losing context, use Wrap up with a'
+    say '    summary (menu 3), start a new conversation, then Continue the work.'
+    say '  • The kit shows recent conversation size on the main dashboard and'
+    say '    project usage dashboard (menu 4).'
+    say '  • In Claude Code, /context shows context usage. You can also ask'
+    say '    Claude for a /statusline; its contents depend on Claude.'
+    say '  • In Codex, use the kit usage notice and start a new conversation'
+    say '    when the current one grows long.'
+    say ''
+    say 'PROJECT'
+    say '  • INSTRUCOES/PROJETO.md: short permanent rules read each time.'
+    say '  • PROMPTS/: short saved prompts. DOCS/: longer documents and progress.'
+    say '  • Check the layout in Project care → 12.'
+    say '  • Resume from the main menu with option 1 (or simply Enter).'
+    return 0
+  fi
   header 'Dicas para render mais com menos esforço'
   say 'ECONOMIA'
   say '  • Uma conversa nova por tarefa; conversa longa fica mais cara.'

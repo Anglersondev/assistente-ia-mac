@@ -8,6 +8,13 @@ COMECE EM 4 PASSOS
 3. Menu 5: crie um projeto ou abra uma pasta que você já tem.
 4. Menu 2 abre uma conversa nova. Menu 1 (ou só Enter) continua de onde parou.
 
+IDIOMA / LANGUAGE
+
+  O menu começa em português do Brasil. Para usar inglês: menu 7 → 8 → 2.
+  A escolha fica salva. Projetos novos organizados usam modelos no idioma
+  escolhido; os arquivos de projetos existentes não são traduzidos.
+  The menu starts in Brazilian Portuguese. For English: menu 7 → 8 → 2.
+
 O MENU PRINCIPAL
 
   Painel no topo: projeto, pasta, ferramenta, RTK e "Conversa" (leve / longa).

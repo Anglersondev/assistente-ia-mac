@@ -30,7 +30,7 @@ Maintained by [Anglersondev](https://github.com/Anglersondev). If this project h
 
 Choose a project in Finder or enter its path. Start a new conversation, resume an existing one, inspect Git changes, or launch a local development server. The project can live anywhere you choose, and its code can be at the project root or inside `CODIGO/` and a first-level subfolder.
 
-The terminal interface is in Brazilian Portuguese. The repository documentation is available in English and Brazilian Portuguese.
+The terminal interface supports Brazilian Portuguese and English. The repository documentation is available in both languages.
 
 ## At a glance
 
@@ -91,7 +91,7 @@ The appropriate agent CLI must be installed and authenticated separately. The to
 4. **Work from the menu.** Start or resume a conversation, review Git status, or start a development server.
 5. **Carry context forward.** Optionally create the session shortcuts from **Project Care → Instructions → 4**. In a new agent session, use `/encerrar` or `/resumo` in Claude Code, or invoke the corresponding Codex skill.
 
-Menu labels are in Brazilian Portuguese. The complete user guide is [GUIA-DE-USO.md](GUIA-DE-USO.md) in the release package.
+The menu starts in Brazilian Portuguese. To select English, open **Ajuda e ajustes (7) → Idioma / Language (8) → English (2)**. The choice is saved for future launches. The complete Portuguese user guide is [GUIA-DE-USO.md](GUIA-DE-USO.md) in the release package.
 
 ## Project layout
 
@@ -146,7 +146,7 @@ Your agents' own permissions, sandbox settings, and access controls continue to 
 
 The 1.0 release was verified on macOS with the system Bash **3.2.57**:
 
-- **328 Python tests passed.**
+- **330 Python tests passed.**
 - **154 RTK shell checks passed; 0 failed.**
 - All 8 `.sh` and `.command` scripts passed `/bin/bash -n`.
 - `ASSISTENTE-IA-MAC.command --check` passed.
@@ -178,7 +178,7 @@ Keep the launcher and `lib/` together when extracting or copying the toolkit.
 
 ## Language
 
-The application menus and built-in project templates are written in Brazilian Portuguese. Read this README in [Brazilian Portuguese](README.pt-BR.md); the full application guide is [GUIA-DE-USO.md](GUIA-DE-USO.md).
+The application starts in Brazilian Portuguese and offers English through **Help and settings → Language**. New organized projects use the selected language for their built-in templates; existing project files are preserved. Read this README in [Brazilian Portuguese](README.pt-BR.md); the full Portuguese guide is [GUIA-DE-USO.md](GUIA-DE-USO.md).
 
 ## Support
 
