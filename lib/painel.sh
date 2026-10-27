@@ -326,10 +326,10 @@ painel_project_tool() {
 
 usage_panel() {
   local path tool name rows='' key mark text count=0 file="$STATE_DIR/recents"
-  header 'Painel de uso dos projetos'
-  if painel_off; then say 'Medição de uso desligada (Ajuda e ajustes → 4)'; return 0; fi
+  header_ui 'Painel de uso dos projetos' 'Project usage dashboard'
+  if painel_off; then say_ui 'Medição de uso desligada (Ajuda e ajustes → 4)' 'Usage measurement is off (Help and settings → 4)'; return 0; fi
   if [ ! -f "$file" ]; then
-    say 'Ainda não há projetos recentes. Crie ou abra um projeto e volte aqui.'
+    say_ui 'Ainda não há projetos recentes. Crie ou abra um projeto e volte aqui.' 'No recent projects yet. Create or open one and return here.'
     return 0
   fi
   while IFS= read -r path; do
@@ -338,35 +338,35 @@ usage_panel() {
     tool="$(painel_project_tool "$path")"
     name="$(basename "$path")"
     key=0
-    if [ -z "$tool" ]; then mark='·'; text="$name — sem ferramenta definida (use Cuidar do projeto → Verificar)"
+    if [ -z "$tool" ]; then mark='·'; text="$name — $(ui 'sem ferramenta definida (use Cuidar do projeto → Verificar)' 'no agent selected (use Project care → Check)')"
     else
       usage_measure "$tool" "$path"
       case "$USAGE_STATE" in
         leve) mark='✓'; text="$name — $tool — $(painel_details)"; key="$USAGE_TOKENS" ;;
         longa) mark='⚠'; text="$name — $tool — $(painel_details)"; key="$USAGE_TOKENS" ;;
         muito-longa) mark='⛔'; text="$name — $tool — $(painel_details)"; key="$USAGE_TOKENS" ;;
-        nenhuma) mark='·'; text="$name — $tool — nenhuma conversa ainda" ;;
-        *) mark='·'; text="$name — $tool — não consegui medir" ;;
+        nenhuma) mark='·'; text="$name — $tool — $(ui 'nenhuma conversa ainda' 'no conversation yet')" ;;
+        *) mark='·'; text="$name — $tool — $(ui 'não consegui medir' 'could not measure')" ;;
       esac
     fi
     rows="${rows}$(printf '%012d' "$key")|  $mark $text"$'\n'
   done < "$file"
   if [ -z "$rows" ]; then
-    say 'Ainda não há projetos recentes. Crie ou abra um projeto e volte aqui.'
+    say_ui 'Ainda não há projetos recentes. Crie ou abra um projeto e volte aqui.' 'No recent projects yet. Create or open one and return here.'
     return 0
   fi
   printf '%s' "$rows" | LC_ALL=C sort -t'|' -k1,1r | cut -d'|' -f2-
   say ''
-  say 'Legenda (uso da conversa, em mil tokens):'
-  say '  ✓ leve: até ~80 mil     ⚠ ficando longa: 80 a 200 mil'
-  say '  ⛔ muito longa: acima de 200 mil'
-  say 'O que fazer:'
-  say '  ✓  continue normalmente.'
-  say '  ⚠  termine a tarefa em andamento e use "Encerrar com resumo".'
-  say '  ⛔  encerre agora. Depois escolha Começar uma conversa nova →'
-  say '      Continuar o trabalho.'
-  say 'Os números vêm do último registro de uso da conversa; as mensagens'
-  say 'são aproximadas. O kit só conta e soma números nos arquivos de'
-  say 'sessão; nada é exibido nem enviado.'
+  say_ui 'Legenda (uso da conversa, em mil tokens):' 'Legend (conversation usage, in thousands of tokens):'
+  say_ui '  ✓ leve: até ~80 mil     ⚠ ficando longa: 80 a 200 mil' '  ✓ light: up to ~80k     ⚠ getting long: 80k to 200k'
+  say_ui '  ⛔ muito longa: acima de 200 mil' '  ⛔ very long: over 200k'
+  say_ui 'O que fazer:' 'What to do:'
+  say_ui '  ✓  continue normalmente.' '  ✓  continue as usual.'
+  say_ui '  ⚠  termine a tarefa em andamento e use "Encerrar com resumo".' '  ⚠  finish the current task and use Wrap up with a summary.'
+  say_ui '  ⛔  encerre agora. Depois escolha Começar uma conversa nova →' '  ⛔  wrap up now. Then choose Start a new conversation →'
+  say_ui '      Continuar o trabalho.' '      Continue the work.'
+  say_ui 'Os números vêm do último registro de uso da conversa; as mensagens' 'Numbers come from the latest conversation usage record; message counts'
+  say_ui 'são aproximadas. O kit só conta e soma números nos arquivos de' 'are approximate. The kit only counts numbers in session files;'
+  say_ui 'sessão; nada é exibido nem enviado.' 'session content is neither displayed nor sent.'
   return 0
 }

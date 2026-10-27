@@ -1,6 +1,8 @@
 # Assistente IA Mac 1.0
 
-Um menu em português para criar ou abrir projetos no lugar que você escolher e trabalhar com **Codex CLI** ou **Claude Code**. Um painel no topo mostra o projeto, a ferramenta, o RTK e o tamanho da conversa. O **RTK** fica em Ajuda e ajustes, com instalação e integração opcionais.
+Um menu em português do Brasil ou inglês para criar ou abrir projetos no lugar que você escolher e trabalhar com **Codex CLI** ou **Claude Code**. Um painel no topo mostra o projeto, a ferramenta, o RTK e o tamanho da conversa. O **RTK** fica em Ajuda e ajustes, com instalação e integração opcionais.
+
+O programa inicia em português do Brasil. Para usar inglês, escolha **Ajuda e ajustes (7) → Idioma / Language (8) → English (2)**. A preferência fica salva. Projetos novos organizados recebem modelos no idioma escolhido; arquivos existentes são preservados.
 
 Cada projeto pode ter **instruções permanentes próprias** e **prompts salvos para tarefas específicas**. Na criação, você escolhe Codex ou Claude; o kit separa os projetos por ferramenta e gera apenas a entrada de instruções correspondente.
 

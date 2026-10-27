@@ -259,24 +259,24 @@ sl_without_install() {
 statusline_menu() {
   local choice
   while :; do
-    header 'Aviso dentro do chat (Claude Code)'
+    header_ui 'Aviso dentro do chat (Claude Code)' 'In-chat usage notice (Claude Code)'
     if [ -n "${PROJECT:-}" ] && type project_profile >/dev/null 2>&1 && [ "$(project_profile 2>/dev/null)" = codex ]; then
-      say 'Atenção: o projeto atual usa o Codex. Esta barra só funciona no Claude Code.'
+      say_ui 'Atenção: o projeto atual usa o Codex. Esta barra só funciona no Claude Code.' 'Note: the current project uses Codex. This bar works only in Claude Code.'
     fi
-    say 'A barra mostra, embaixo do chat, quanto contexto a conversa já usa.'
-    say 'Fica verde enquanto está leve, amarela quando está ficando longa e'
-    say 'vermelha quando é hora de encerrar com resumo.'
-    say 'É opcional e só funciona no Claude Code (o Codex não tem barra).'
-    say 'Nada é alterado sem prévia, sua confirmação digitada e backup.'
+    say_ui 'A barra mostra, embaixo do chat, quanto contexto a conversa já usa.' 'The bar shows context usage below the chat.'
+    say_ui 'Fica verde enquanto está leve, amarela quando está ficando longa e' 'It is green while usage is light, yellow as the conversation grows,'
+    say_ui 'vermelha quando é hora de encerrar com resumo.' 'and red when it is time to wrap up with a summary.'
+    say_ui 'É opcional e só funciona no Claude Code (o Codex não tem barra).' 'It is optional and works only in Claude Code (Codex has no bar).'
+    say_ui 'Nada é alterado sem prévia, sua confirmação digitada e backup.' 'Nothing changes without a preview, typed confirmation, and backup.'
     say ''
     statusline_state_line
     say ''
-    say '1) Ver como ficará'
-    say '2) Instalar a barra'
-    say '3) Remover a barra'
-    say '4) Como ver o uso sem instalar'
-    say '0) Voltar'
-    ask 'Escolha: ' || return 1
+    say_ui '1) Ver como ficará' '1) Preview the bar'
+    say_ui '2) Instalar a barra' '2) Install the bar'
+    say_ui '3) Remover a barra' '3) Remove the bar'
+    say_ui '4) Como ver o uso sem instalar' '4) View usage without installing'
+    say_ui '0) Voltar' '0) Back'
+    ask_ui 'Escolha: ' 'Choose: ' || return 1
     choice="$REPLY"
     case "$choice" in
       1) sl_preview; pause || return 1 ;;
@@ -284,7 +284,7 @@ statusline_menu() {
       3) sl_remove; pause || return 1 ;;
       4) sl_without_install; pause || return 1 ;;
       0|'') return 0 ;;
-      *) say 'Opção inválida.' ;;
+      *) say_ui 'Opção inválida.' 'Invalid option.' ;;
     esac
   done
 }

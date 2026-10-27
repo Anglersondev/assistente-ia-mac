@@ -29,6 +29,7 @@ Você pode escolher uma pasta pelo Finder ou digitar o caminho, criar um projeto
 - Servidor local para pacotes Node.js encontrados no projeto.
 - Verificação da organização do projeto e integração opcional com RTK.
 - Compatibilidade com o Bash 3.2 incluído no macOS.
+- Menu em português do Brasil ou inglês, com idioma salvo para as próximas aberturas.
 
 ## Comece em quatro passos
 
@@ -36,6 +37,8 @@ Você pode escolher uma pasta pelo Finder ou digitar o caminho, criar um projeto
 2. Mantenha a pasta `Assistente-IA-Mac-1.0` inteira, inclusive `lib/`.
 3. Abra `ASSISTENTE-IA-MAC.command` no Terminal.
 4. No menu **5**, crie um projeto ou abra uma pasta existente; escolha Codex CLI ou Claude Code.
+
+Para usar o programa em inglês, abra **Ajuda e ajustes (7) → Idioma / Language (8) → English (2)**. Projetos novos organizados recebem modelos de arquivos no idioma selecionado; os arquivos de projetos existentes são preservados.
 
 Se o macOS não abrir o arquivo com dois cliques, use:
 
@@ -76,11 +79,11 @@ O kit organiza o trabalho, mas não é uma sandbox. Ele evita substituir arquivo
 
 ## Verificação
 
-A versão 1.0 foi verificada no macOS com Bash 3.2.57: 328 testes Python, 154 verificações RTK, análise de sintaxe dos scripts e `--check`. Os testes de integração usam ferramentas simuladas e diretórios isolados; não substituem um teste com suas contas reais.
+A versão 1.0 foi verificada no macOS com Bash 3.2.57: 330 testes Python, 154 verificações RTK, análise de sintaxe dos scripts e `--check`. Os testes de integração usam ferramentas simuladas e diretórios isolados; não substituem um teste com suas contas reais.
 
 ## Idioma
 
-Os menus do Terminal e os modelos de projeto estão em português do Brasil. Este README também está disponível em [inglês](README.md).
+O programa inicia em português do Brasil e oferece inglês em **Ajuda e ajustes → Idioma / Language**. Este README também está disponível em [inglês](README.md).
 
 ## Contribuir
 

@@ -571,33 +571,33 @@ rtk_toggle() {
 rtk_menu() {
   local rtk_choice='' rtk_tool='' rtk_line_codex='' rtk_line_claude='' rtk_notice=''
   while :; do
-    header 'RTK · saída compacta para seus agentes'
+    header_ui 'RTK · saída compacta para seus agentes' 'RTK · compact output for your agents'
     if rtk_present; then
-      say "RTK encontrado em: $(command -v rtk)"
+      say "$(ui 'RTK encontrado em' 'RTK found at'): $(command -v rtk)"
     else
-      say 'RTK: ainda não instalado.'
+      say_ui 'RTK: ainda não instalado.' 'RTK: not installed yet.'
     fi
     rtk_line_codex="$(rtk_state_line codex)"; rtk_line_claude="$(rtk_state_line claude)"
     say "  Codex:  ${rtk_line_codex#RTK: }"
     say "  Claude: ${rtk_line_claude#RTK: }"
     rtk_notice="$(rtk_update_notice)"
-    [ -z "$rtk_notice" ] || say "  Atualização: ${rtk_notice%% →*} → opção 10"
-    say 'O padrão é RTK ligado: o kit oferece ativar ao abrir uma conversa.'
-    say 'Para parar de ser perguntado: volte e abra Ajuda e ajustes → 4.'
-    say 'A integração automática é configurada separadamente para cada agente.'
+    [ -z "$rtk_notice" ] || say "  $(ui 'Atualização' 'Update'): ${rtk_notice%% →*} → $(ui 'opção' 'option') 10"
+    say_ui 'O padrão é RTK ligado: o kit oferece ativar ao abrir uma conversa.' 'RTK is on by default: the kit offers to enable it when opening a conversation.'
+    say_ui 'Para parar de ser perguntado: volte e abra Ajuda e ajustes → 4.' 'To stop being asked, go back to Help and settings → 4.'
+    say_ui 'A integração automática é configurada separadamente para cada agente.' 'Automatic integration is configured separately for each agent.'
     say ''
-    say '  1) Instalar RTK OSS'
-    say '  2) Ver se está funcionando e quanto economizou'
-    say '  3) Ativar integração em um agente'
-    say '  4) Desativar integração em um agente'
-    say '  5) Entender o RTK'
-    say '  6) Ver somente a economia (rtk gain)'
-    say '  7) Abrir monitor RTK ao vivo em outra janela'
-    say '  8) Ver últimos comandos RTK (histórico)'
-    say '  9) Testar se o RTK entende um comando (não executa git)'
-    say ' 10) Atualizar RTK (verifica se há versão nova)'
-    say '  0) Voltar'
-    ask 'Escolha: ' || return 1
+    say_ui '  1) Instalar RTK OSS' '  1) Install RTK OSS'
+    say_ui '  2) Ver se está funcionando e quanto economizou' '  2) Check status and savings'
+    say_ui '  3) Ativar integração em um agente' '  3) Enable integration for an agent'
+    say_ui '  4) Desativar integração em um agente' '  4) Disable integration for an agent'
+    say_ui '  5) Entender o RTK' '  5) Understand RTK'
+    say_ui '  6) Ver somente a economia (rtk gain)' '  6) View savings only (rtk gain)'
+    say_ui '  7) Abrir monitor RTK ao vivo em outra janela' '  7) Open live RTK monitor in another window'
+    say_ui '  8) Ver últimos comandos RTK (histórico)' '  8) View recent RTK commands (history)'
+    say_ui '  9) Testar se o RTK entende um comando (não executa git)' '  9) Test whether RTK understands a command (does not run git)'
+    say_ui ' 10) Atualizar RTK (verifica se há versão nova)' ' 10) Update RTK (check for a new version)'
+    say_ui '  0) Voltar' '  0) Back'
+    ask_ui 'Escolha: ' 'Choose: ' || return 1
     rtk_choice="$REPLY"
     case "$rtk_choice" in
       0|'') return 0 ;;
