@@ -18,6 +18,12 @@
   <a href="https://pixgg.com/Anglerson">Support the maintainer</a>
 </div>
 
+# Assistente IA Mac — AI assistant for macOS, Codex CLI and Claude Code
+
+**A bilingual terminal workspace for AI coding on Mac.** Organize projects, reuse prompts, resume sessions, inspect Git changes, and launch local development servers from one menu. The interface detects English or Brazilian Portuguese on first launch and lets you save a different choice.
+
+**[Download the latest release](https://github.com/Anglersondev/assistente-ia-mac/releases/latest)** · [Quick start](#quick-start) · [Português (Brasil)](README.pt-BR.md)
+
 ---
 
 **Languages:** English · [Português (Brasil)](README.pt-BR.md)
@@ -89,7 +95,7 @@ The appropriate agent CLI must be installed and authenticated separately. The to
 2. **Choose the agent.** The project profile determines whether Codex CLI or Claude Code is used.
 3. **Add project context.** Write durable project rules in `INSTRUCOES/PROJETO.md`; keep task-specific requests in `PROMPTS/`.
 4. **Work from the menu.** Start or resume a conversation, review Git status, or start a development server.
-5. **Carry context forward.** Optionally create the session shortcuts from **Project Care → Instructions → 4**. In a new agent session, use `/encerrar` or `/resumo` in Claude Code, or invoke the corresponding Codex skill.
+5. **Carry context forward.** Optionally create the session shortcuts from **Project Care → Instructions → 4**. With English selected, use `/wrap-up` or `/summary` in Claude Code, or `$wrap-up` or `$summary` in Codex.
 
 On first launch, the menu follows the macOS system language when it is English or Brazilian Portuguese; other system languages use Brazilian Portuguese. To change it, open **Help and settings (7) → Language (8)**. The choice is saved for future launches and takes priority over the system language. The complete Portuguese user guide is [GUIA-DE-USO.md](GUIA-DE-USO.md) in the release package.
 
