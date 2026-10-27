@@ -14,10 +14,15 @@
   <a href="#quick-start">Quick start</a> ·
   <a href="#project-layout">Project layout</a> ·
   <a href="#security-and-privacy">Security & privacy</a> ·
-  <a href="#verification">Verification</a>
+  <a href="#verification">Verification</a> ·
+  <a href="https://pixgg.com/Anglerson">Support the maintainer</a>
 </div>
 
 ---
+
+**Languages:** English · [Português (Brasil)](README.pt-BR.md)
+
+Maintained by [Anglersondev](https://github.com/Anglersondev). If this project helps you, you can [support its maintainer](https://pixgg.com/Anglerson).
 
 ## What it does
 
@@ -25,7 +30,7 @@
 
 Choose a project in Finder or enter its path. Start a new conversation, resume an existing one, inspect Git changes, or launch a local development server. The project can live anywhere you choose, and its code can be at the project root or inside `CODIGO/` and a first-level subfolder.
 
-The interface is in Brazilian Portuguese. This repository documentation is in English so more developers can discover and evaluate the project.
+The terminal interface is in Brazilian Portuguese. The repository documentation is available in English and Brazilian Portuguese.
 
 ## At a glance
 
@@ -173,7 +178,11 @@ Keep the launcher and `lib/` together when extracting or copying the toolkit.
 
 ## Language
 
-The application menus and built-in project templates are written in Brazilian Portuguese. This README is in English for the GitHub audience.
+The application menus and built-in project templates are written in Brazilian Portuguese. Read this README in [Brazilian Portuguese](README.pt-BR.md); the full application guide is [GUIA-DE-USO.md](GUIA-DE-USO.md).
+
+## Support
+
+Donations go to the project maintainer through [PixGG / Anglerson](https://pixgg.com/Anglerson). They are optional; all features remain available without a donation.
 
 ## Contributing
 
