@@ -178,6 +178,31 @@ class MenuTests(base.AssistantTests):
         self.assertIn("Projects: switch, open, or create", out)
         self.assertNotIn("O QUE VOCÊ QUER FAZER?", out)
 
+    def test_system_language_detection_and_saved_choice(self):
+        defaults = self.bin / "defaults"
+        defaults.write_text('#!/bin/bash\nprintf \'(\\n    "en-US",\\n    "pt-BR"\\n)\\n\'\n')
+        defaults.chmod(0o755)
+        out = self.run_main(input_text="0\n").stdout
+        self.assertIn("WHAT WOULD YOU LIKE TO DO?", out)
+        self.assertFalse((self.state / "language").exists())
+
+        (self.state / "language").write_text("pt-BR\n")
+        out = self.run_main(input_text="0\n").stdout
+        self.assertIn("O QUE VOCÊ QUER FAZER?", out)
+
+        self.env["ASSISTENTE_LANG"] = "en"
+        out = self.run_main(input_text="0\n").stdout
+        self.assertIn("WHAT WOULD YOU LIKE TO DO?", out)
+
+    def test_system_language_falls_back_to_portuguese(self):
+        defaults = self.bin / "defaults"
+        defaults.write_text('#!/bin/bash\nprintf \'(\\n    "es-ES",\\n    "en-US"\\n)\\n\'\n')
+        defaults.chmod(0o755)
+        self.assertIn("O QUE VOCÊ QUER FAZER?", self.run_main(input_text="0\n").stdout)
+
+        defaults.write_text('#!/bin/bash\n[ "$3" = AppleLanguages ] && exit 1\nprintf "en_US\\n"\n')
+        self.assertIn("WHAT WOULD YOU LIKE TO DO?", self.run_main(input_text="0\n").stdout)
+
     def test_english_project_template_and_new_project_default(self):
         self.env["ASSISTENTE_LANG"] = "en"
         name = "English project"

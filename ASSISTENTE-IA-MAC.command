@@ -21,11 +21,24 @@ ui() { if [ "$APP_LANG" = en ]; then printf '%s' "$2"; else printf '%s' "$1"; fi
 say_ui() { say "$(ui "$1" "$2")"; }
 ask_ui() { ask "$(ui "$1" "$2")"; }
 header_ui() { header "$(ui "$1" "$2")"; }
+detect_system_language() {
+  local languages=''
+  if command -v defaults >/dev/null 2>&1; then
+    languages="$(defaults read -g AppleLanguages 2>/dev/null)" || languages=''
+    [ -n "$languages" ] || languages="$(defaults read -g AppleLocale 2>/dev/null)" || languages=''
+  fi
+  if [[ "$languages" =~ [A-Za-z][A-Za-z] ]]; then
+    case "${BASH_REMATCH[0]}" in
+      en|EN|En|eN) APP_LANG=en; return ;;
+    esac
+  fi
+  APP_LANG='pt-BR'
+}
 load_language() {
   local saved=''
   if [ -n "${ASSISTENTE_LANG:-}" ]; then saved="$ASSISTENTE_LANG"
   elif [ -f "$STATE_DIR/language" ] && [ ! -L "$STATE_DIR/language" ]; then IFS= read -r saved < "$STATE_DIR/language"; fi
-  case "$saved" in en|pt-BR) APP_LANG="$saved" ;; *) APP_LANG='pt-BR' ;; esac
+  case "$saved" in en|pt-BR) APP_LANG="$saved" ;; *) detect_system_language ;; esac
 }
 language_menu() {
   local choice

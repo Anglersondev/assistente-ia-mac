@@ -91,7 +91,7 @@ The appropriate agent CLI must be installed and authenticated separately. The to
 4. **Work from the menu.** Start or resume a conversation, review Git status, or start a development server.
 5. **Carry context forward.** Optionally create the session shortcuts from **Project Care → Instructions → 4**. In a new agent session, use `/encerrar` or `/resumo` in Claude Code, or invoke the corresponding Codex skill.
 
-The menu starts in Brazilian Portuguese. To select English, open **Ajuda e ajustes (7) → Idioma / Language (8) → English (2)**. The choice is saved for future launches. The complete Portuguese user guide is [GUIA-DE-USO.md](GUIA-DE-USO.md) in the release package.
+On first launch, the menu follows the macOS system language when it is English or Brazilian Portuguese; other system languages use Brazilian Portuguese. To change it, open **Help and settings (7) → Language (8)**. The choice is saved for future launches and takes priority over the system language. The complete Portuguese user guide is [GUIA-DE-USO.md](GUIA-DE-USO.md) in the release package.
 
 ## Project layout
 
@@ -146,7 +146,7 @@ Your agents' own permissions, sandbox settings, and access controls continue to 
 
 The 1.0 release was verified on macOS with the system Bash **3.2.57**:
 
-- **330 Python tests passed.**
+- **332 Python tests passed.**
 - **154 RTK shell checks passed; 0 failed.**
 - All 8 `.sh` and `.command` scripts passed `/bin/bash -n`.
 - `ASSISTENTE-IA-MAC.command --check` passed.
@@ -178,7 +178,7 @@ Keep the launcher and `lib/` together when extracting or copying the toolkit.
 
 ## Language
 
-The application starts in Brazilian Portuguese and offers English through **Help and settings → Language**. New organized projects use the selected language for their built-in templates; existing project files are preserved. Read this README in [Brazilian Portuguese](README.pt-BR.md); the full Portuguese guide is [GUIA-DE-USO.md](GUIA-DE-USO.md).
+The application detects the macOS language on first launch (English or Brazilian Portuguese; otherwise Brazilian Portuguese). A saved choice in **Help and settings → Language** takes priority. New organized projects use the selected language for their built-in templates; existing project files are preserved. Read this README in [Brazilian Portuguese](README.pt-BR.md); the full Portuguese guide is [GUIA-DE-USO.md](GUIA-DE-USO.md).
 
 ## Support
 
