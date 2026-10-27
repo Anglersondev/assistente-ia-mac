@@ -53,7 +53,7 @@ The toolkit organizes the workflow around each agent's native project entry file
 - **Choose your own project location.** Open an existing directory or create a new project under a location you select in Finder or by path.
 - **Project-specific context.** Keep durable instructions in `INSTRUCOES/PROJETO.md`; the project’s `AGENTS.md` or `CLAUDE.md` points the agent to them.
 - **Reusable task prompts.** Save prompts in `PROMPTS/` and choose which one to send when a conversation starts.
-- **Session continuity.** Continue a conversation, start a clean one, or use optional `encerrar` and `resumo` shortcuts to record progress and prepare a concise handoff.
+- **Session continuity.** Continue a conversation, start a clean one, or use optional `wrap-up` and `summary` shortcuts to record progress and prepare a concise handoff.
 - **Native agent skills and commands.** Generate optional Codex skills under `.agents/skills/` or Claude Code commands under `.claude/commands/` without replacing existing files.
 - **Git visibility across nested code.** Review status at the project root or in repositories found in `CODIGO/`, its immediate subfolders, and direct project subfolders.
 - **Local development server.** Find `package.json` at the root or in supported code subfolders. When several packages are available, select which one to run.
@@ -123,12 +123,14 @@ The shortcuts reuse the default prompts in `PROMPTS/`:
 
 | Agent | Shortcut | What it does |
 |---|---|---|
-| Claude Code | `/encerrar` | Summarizes completed work and updates `DOCS/ANDAMENTO.md` |
-| Claude Code | `/resumo` | Produces a short context handoff for a new conversation |
-| Codex | `$encerrar` | Uses the same session wrap-up prompt |
-| Codex | `$resumo` | Uses the same quick-summary prompt |
+| Claude Code | `/wrap-up` | Summarizes completed work and updates `DOCS/ANDAMENTO.md` |
+| Claude Code | `/summary` | Produces a short context handoff for a new conversation |
+| Codex | `$wrap-up` | Uses the same session wrap-up prompt |
+| Codex | `$summary` | Uses the same quick-summary prompt |
 
-They are opt-in and project-local. Existing command or skill files are preserved.
+These names are created when English is selected. In Portuguese, the names are `/encerrar`, `/resumo`, `$encerrar`, and `$resumo`. They are opt-in and project-local. Existing command or skill files are preserved.
+
+Terminal options also have English names: `--diagnostics`, `--rtk gain`, `--rtk history`, `--rtk verify`, `--rtk update`, and `--rtk enable|disable codex|claude`. Existing Portuguese options remain available.
 
 ## Security and privacy
 
@@ -146,8 +148,8 @@ Your agents' own permissions, sandbox settings, and access controls continue to 
 
 The 1.0 release was verified on macOS with the system Bash **3.2.57**:
 
-- **332 Python tests passed.**
-- **154 RTK shell checks passed; 0 failed.**
+- **334 Python tests passed.**
+- **156 RTK shell checks passed; 0 failed.**
 - All 8 `.sh` and `.command` scripts passed `/bin/bash -n`.
 - `ASSISTENTE-IA-MAC.command --check` passed.
 - Codex skill manifests were validated; Git discovery was also checked against a real temporary repository.

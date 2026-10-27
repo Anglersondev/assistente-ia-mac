@@ -1399,7 +1399,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then
   case "${1:-}" in
     --help|-h)
       if [ "$APP_LANG" = en ]; then
-        printf 'Assistente IA Mac %s\n\nDouble-click the launcher or run: /bin/bash ASSISTENTE-IA-MAC.command\n\n--check         Check files and syntax without changing preferences\n--diagnostico   Show versions and sign-in status (read-only)\n--rtk          Open the RTK menu\n--rtk status   Show installation and integrations\n--rtk ganhos   Show estimated savings\n--rtk historico   Show recent recorded operations\n--rtk verificar   Test command rewriting without running commands\n--rtk monitor    Open the live monitor in this Terminal\n--rtk atualizar  Check for a new RTK version and update after confirmation\n--rtk ativar codex|claude       Configure integration after confirmation\n--rtk desativar codex|claude    Remove integration after confirmation\n' "$VERSION"
+        printf 'Assistente IA Mac %s\n\nDouble-click the launcher or run: /bin/bash ASSISTENTE-IA-MAC.command\n\n--check         Check files and syntax without changing preferences\n--diagnostics   Show versions and sign-in status (read-only)\n--rtk          Open the RTK menu\n--rtk status   Show installation and integrations\n--rtk gain     Show estimated savings\n--rtk history  Show recent recorded operations\n--rtk verify   Test command rewriting without running commands\n--rtk monitor  Open the live monitor in this Terminal\n--rtk update   Check for a new RTK version and update after confirmation\n--rtk enable codex|claude     Configure integration after confirmation\n--rtk disable codex|claude    Remove integration after confirmation\n' "$VERSION"
       else
         printf 'Assistente IA Mac %s\n\nAbra com dois cliques ou execute: /bin/bash ASSISTENTE-IA-MAC.command\n\n--check         Confere arquivos e sintaxe sem alterar preferências\n--diagnostico   Mostra versões e situação do login (somente leitura)\n--rtk          Abre o menu RTK\n--rtk status   Mostra instalação e integrações\n--rtk ganhos   Mostra economia estimada\n--rtk historico   Exibe últimas operações registradas\n--rtk verificar   Testa o mecanismo de reescrita sem executar comandos\n--rtk monitor    Abre monitor ao vivo neste terminal\n--rtk atualizar  Procura versão nova do RTK e atualiza, após confirmação\n--rtk ativar codex|claude       Configura integração, após confirmação\n--rtk desativar codex|claude    Remove integração, após confirmação\n' "$VERSION"
       fi
@@ -1418,9 +1418,9 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then
       done
       [ "$result" -ne 0 ] || say_ui 'Kit completo. Sintaxe Bash verificada.' 'Kit complete. Bash syntax verified.'
       exit "$result" ;;
-    --diagnostico) diagnostics; exit 0 ;;
+    --diagnostico|--diagnostics) diagnostics; exit 0 ;;
     --rtk) shift; rtk_command "$@"; exit $? ;;
     '') main ;;
-    *) warn 'Argumento desconhecido. Use --help.'; exit 2 ;;
+    *) warn "$(ui 'Argumento desconhecido. Use --help.' 'Unknown argument. Use --help.')"; exit 2 ;;
   esac
 fi

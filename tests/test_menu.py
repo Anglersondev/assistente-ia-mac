@@ -203,6 +203,18 @@ class MenuTests(base.AssistantTests):
         defaults.write_text('#!/bin/bash\n[ "$3" = AppleLanguages ] && exit 1\nprintf "en_US\\n"\n')
         self.assertIn("WHAT WOULD YOU LIKE TO DO?", self.run_main(input_text="0\n").stdout)
 
+    def test_english_cli_help_and_aliases(self):
+        self.env["ASSISTENTE_LANG"] = "en"
+        help_text = self.run_main("--help").stdout
+        for command in ("--diagnostics", "--rtk gain", "--rtk history", "--rtk verify",
+                        "--rtk update", "--rtk enable", "--rtk disable"):
+            self.assertIn(command, help_text)
+        self.assertNotIn("--rtk ganhos", help_text)
+        self.assertIn("Diagnostics", self.run_main("--diagnostics").stdout)
+        result = self.run_main("--rtk", "gain")
+        self.assertIn("recorded savings", result.stdout)
+        self.assertIn("RTK is not installed", result.stderr)
+
     def test_english_project_template_and_new_project_default(self):
         self.env["ASSISTENTE_LANG"] = "en"
         name = "English project"

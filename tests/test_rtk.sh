@@ -142,6 +142,13 @@ check 'Easy gains does not query or alter hooks' log_no_prefix 'rtk|init|'
 : > "$TEST_LOG"
 rtk_command desativar codex <<< 'DESATIVAR'
 check 'CLI deactivation dispatches to selected agent' log_has 'rtk|init|--global|--codex|--uninstall|'
+: > "$TEST_LOG"; APP_LANG=en
+rtk_command enable codex <<< 'ENABLE'
+check 'English enable command applies Codex integration' log_has 'rtk|init|--global|--codex|'
+: > "$TEST_LOG"
+rtk_command disable codex <<< 'DISABLE'
+check 'English disable command applies Codex integration' log_has 'rtk|init|--global|--codex|--uninstall|'
+APP_LANG=pt-BR
 : > "$TEST_LOG"
 rtk_command ativar codex --uninstall <<< 'ATIVAR'
 check 'Unexpected CLI argument rejected' test "$?" -eq 2

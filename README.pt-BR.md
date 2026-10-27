@@ -30,6 +30,7 @@ Você pode escolher uma pasta pelo Finder ou digitar o caminho, criar um projeto
 - Verificação da organização do projeto e integração opcional com RTK.
 - Compatibilidade com o Bash 3.2 incluído no macOS.
 - Menu em português do Brasil ou inglês: detecta o idioma do macOS na primeira abertura e salva qualquer escolha manual.
+- Comandos em inglês quando esse idioma é escolhido: opções do Terminal como `--diagnostics` e `--rtk enable`, além dos atalhos `/wrap-up`, `/summary`, `$wrap-up` e `$summary` criados em projetos novos. Os nomes antigos em português continuam aceitos.
 
 ## Comece em quatro passos
 
@@ -79,7 +80,7 @@ O kit organiza o trabalho, mas não é uma sandbox. Ele evita substituir arquivo
 
 ## Verificação
 
-A versão 1.0 foi verificada no macOS com Bash 3.2.57: 332 testes Python, 154 verificações RTK, análise de sintaxe dos scripts e `--check`. Os testes de integração usam ferramentas simuladas e diretórios isolados; não substituem um teste com suas contas reais.
+A versão 1.0 foi verificada no macOS com Bash 3.2.57: 334 testes Python, 156 verificações RTK, análise de sintaxe dos scripts e `--check`. Os testes de integração usam ferramentas simuladas e diretórios isolados; não substituem um teste com suas contas reais.
 
 ## Idioma
 

@@ -10,11 +10,11 @@ rtk_present() {
 
 rtk_version() {
   if ! rtk_present; then
-    warn 'RTK ainda não está instalado. Use a opção Instalar RTK deste menu.'
+    warn "$(ui 'RTK ainda não está instalado. Use a opção Instalar RTK deste menu.' 'RTK is not installed yet. Use Install RTK in this menu.')"
     return 1
   fi
   if ! bounded_capture 10 rtk --version; then
-    warn 'O comando rtk foi encontrado, mas não respondeu corretamente.'
+    warn "$(ui 'O comando rtk foi encontrado, mas não respondeu corretamente.' 'The rtk command was found but did not respond correctly.')"
     return 1
   fi
   say "$CAPTURE"
@@ -23,8 +23,8 @@ rtk_version() {
 rtk_identity() {
   rtk_version || return 1
   if ! bounded_capture 10 rtk gain; then
-    warn 'rtk gain falhou: pode ser outro programa chamado rtk ou uma instalação com problema.'
-    say 'Confira o diagnóstico abaixo. O kit não vai substituir esse executável.'
+    warn "$(ui 'rtk gain falhou: pode ser outro programa chamado rtk ou uma instalação com problema.' 'rtk gain failed: this may be another program named rtk or a broken installation.')"
+    say_ui 'Confira o diagnóstico abaixo. O kit não vai substituir esse executável.' 'Check the diagnostics below. The toolkit will not replace this executable.'
     say "$CAPTURE"
     return 1
   fi
@@ -36,7 +36,7 @@ rtk_help_supports() {
   local rtk_required="$1"
   local rtk_pattern="(^|[[:space:],])${rtk_required}([[:space:],=<]|$)"
   [[ "$RTK_INIT_HELP" =~ $rtk_pattern ]] && return 0
-  warn "Esta versão do RTK não anuncia $rtk_required. Atualize o RTK antes desta ação."
+  warn "$(ui "Esta versão do RTK não anuncia $rtk_required. Atualize o RTK antes desta ação." "This RTK version does not support $rtk_required. Update RTK before this action.")"
   return 1
 }
 
@@ -53,11 +53,11 @@ rtk_show_agent() {
   local rtk_tool="$1"
   local -a rtk_show_args
   rtk_show_args=(init)
-  say "Integração $rtk_tool:"
+  say "$(ui 'Integração' 'Integration') $rtk_tool:"
   rtk_help_supports --show || return 1
   case "$rtk_tool" in
     codex)
-      rtk_help_supports --codex || { say 'Estado do Codex não consultado nesta versão.'; return 1; }
+      rtk_help_supports --codex || { say_ui 'Estado do Codex não consultado nesta versão.' 'Codex integration status is unavailable in this version.'; return 1; }
       rtk_show_args+=(--codex) ;;
     claude) ;;
     *) return 1 ;;
@@ -68,18 +68,18 @@ rtk_show_agent() {
     return 0
   fi
   say "$CAPTURE"
-  warn "Não foi possível consultar a integração $rtk_tool; seu estado não foi confirmado."
+  warn "$(ui "Não foi possível consultar a integração $rtk_tool; seu estado não foi confirmado." "Could not check the $rtk_tool integration; its status is unconfirmed.")"
   return 1
 }
 
 rtk_gains() {
-  header 'RTK · economia registrada'
+  header_ui 'RTK · economia registrada' 'RTK · recorded savings'
   rtk_identity || return 1
   say "$CAPTURE"
   say ''
-  say 'Os números (tokens) são estimativas do texto de comandos que o RTK encurtou.'
-  say 'Essa economia não representa todo o consumo ou o custo da conversa.'
-  say 'Comando direto no Terminal: rtk gain'
+  say_ui 'Os números (tokens) são estimativas do texto de comandos que o RTK encurtou.' 'The token numbers estimate the command output shortened by RTK.'
+  say_ui 'Essa economia não representa todo o consumo ou o custo da conversa.' 'These savings do not represent total conversation usage or cost.'
+  say_ui 'Comando direto no Terminal: rtk gain' 'Direct Terminal command: rtk gain'
 }
 
 rtk_command() {
@@ -92,68 +92,70 @@ rtk_command() {
     verificar|verify) [ "$#" -eq 1 ] && { rtk_verify; return $?; } ;;
     monitor|watch) [ "$#" -eq 1 ] && { rtk_monitor; return $?; } ;;
     atualizar|update) [ "$#" -eq 1 ] && { rtk_update; return $?; } ;;
-    ativar|desativar)
-      if [ "$#" -eq 2 ]; then rtk_toggle "$2" "$1"; return $?; fi ;;
+    ativar|enable)
+      if [ "$#" -eq 2 ]; then rtk_toggle "$2" ativar; return $?; fi ;;
+    desativar|disable)
+      if [ "$#" -eq 2 ]; then rtk_toggle "$2" desativar; return $?; fi ;;
   esac
-  warn 'Uso: --rtk [menu|status|ganhos|historico|verificar|monitor|atualizar|ativar codex|ativar claude|desativar codex|desativar claude]'
+  warn "$(ui 'Uso: --rtk [menu|status|ganhos|historico|verificar|monitor|atualizar|ativar codex|claude|desativar codex|claude]' 'Usage: --rtk [menu|status|gain|history|verify|monitor|update|enable codex|claude|disable codex|claude]')"
   return 2
 }
 
 # Somente leitura. O histórico é global e não identifica necessariamente qual
 # agente gerou cada comando. Nunca limpe as estatísticas automaticamente.
 rtk_history() {
-  header 'RTK · últimos comandos registrados'
+  header_ui 'RTK · últimos comandos registrados' 'RTK · recent recorded commands'
   rtk_identity || return 1
   if ! bounded_capture 10 rtk gain --history; then
     say "$CAPTURE"
-    warn 'Esta versão do RTK não forneceu o histórico. Confira rtk gain --help.'
+    warn "$(ui 'Esta versão do RTK não forneceu o histórico. Confira rtk gain --help.' 'This RTK version did not provide history. Check rtk gain --help.')"
     return 1
   fi
   say "$CAPTURE"
-  say 'O histórico é global. Compare horários e atividade no agente'
-  say 'para identificar o uso.'
-  say 'Comandos internos Read/Grep/Glob do agente podem não aparecer aqui.'
+  say_ui 'O histórico é global. Compare horários e atividade no agente' 'History is global. Compare timestamps with agent activity'
+  say_ui 'para identificar o uso.' 'to identify usage.'
+  say_ui 'Comandos internos Read/Grep/Glob do agente podem não aparecer aqui.' 'Internal Read/Grep/Glob agent commands may not appear here.'
 }
 
 # Testa o reescritor SEM executar o comando git e SEM modificar hooks.
 # Passar no teste significa que o binário reconhece um comando de exemplo;
 # NÃO confirma que o hook foi acionado durante uma conversa real.
 rtk_verify() {
-  header 'RTK · testar se ele entende um comando (sem executar git)'
+  header_ui 'RTK · testar se ele entende um comando (sem executar git)' 'RTK · test command rewriting (without running git)'
   rtk_identity || return 1
   if ! bounded_capture 10 rtk rewrite 'git status'; then
     say "$CAPTURE"
-    warn 'rtk rewrite falhou; atualize o RTK ou examine rtk --help.'
+    warn "$(ui 'rtk rewrite falhou; atualize o RTK ou examine rtk --help.' 'rtk rewrite failed; update RTK or check rtk --help.')"
     return 1
   fi
-  say "Reescrita retornada: $CAPTURE"
+  say "$(ui 'Reescrita retornada' 'Rewritten command'): $CAPTURE"
   case "$CAPTURE" in
     *rtk*git*status*)
-      say 'O RTK entendeu o comando. Isso não prova que a ligação com o Codex'
-      say 'ou o Claude esteja ativa.'
-      say 'Para conferir de verdade: ative a ligação, reinicie o agente, use um'
-      say 'comando Git e abra a opção 8 (histórico) deste menu RTK.'
+      say_ui 'O RTK entendeu o comando. Isso não prova que a ligação com o Codex' 'RTK understood the command. This does not prove that its integration'
+      say_ui 'ou o Claude esteja ativa.' 'with Codex or Claude is active.'
+      say_ui 'Para conferir de verdade: ative a ligação, reinicie o agente, use um' 'To verify it, enable the integration, restart the agent, run a Git'
+      say_ui 'comando Git e abra a opção 8 (histórico) deste menu RTK.' 'command, and open option 8 (history) in this RTK menu.'
       return 0 ;;
-    *) warn 'A resposta não corresponde à reescrita esperada; confira a versão do RTK.'; return 1 ;;
+    *) warn "$(ui 'A resposta não corresponde à reescrita esperada; confira a versão do RTK.' 'The response does not match the expected rewrite; check the RTK version.')"; return 1 ;;
   esac
 }
 
 # Use em uma SEGUNDA janela enquanto o agente continua trabalhando na primeira.
 # Esta função deixa o terminal ocupado intencionalmente até Ctrl+C.
 rtk_monitor() {
-  header 'RTK · monitor ao vivo'
+  header_ui 'RTK · monitor ao vivo' 'RTK · live monitor'
   rtk_identity || return 1
   if ! bounded_capture 10 rtk gain --help; then
-    warn 'Não foi possível consultar os recursos do RTK instalado.'
+    warn "$(ui 'Não foi possível consultar os recursos do RTK instalado.' 'Could not check the installed RTK features.')"
     return 1
   fi
   case "$CAPTURE" in
     *--watch*) ;;
-    *) warn 'Sua versão do RTK não anuncia --watch. Atualize o RTK para usar o monitor.'; return 1 ;;
+    *) warn "$(ui 'Sua versão do RTK não anuncia --watch. Atualize o RTK para usar o monitor.' 'Your RTK version does not support --watch. Update RTK to use the monitor.')"; return 1 ;;
   esac
-  say 'Monitor iniciado. Para fechar, pressione Ctrl+C.'
-  say 'As estatísticas são globais e medem a economia estimada nas saídas,'
-  say 'não a conta total da IA.'
+  say_ui 'Monitor iniciado. Para fechar, pressione Ctrl+C.' 'Monitor started. Press Ctrl+C to close it.'
+  say_ui 'As estatísticas são globais e medem a economia estimada nas saídas,' 'Statistics are global and estimate savings in command output,'
+  say_ui 'não a conta total da IA.' 'not total AI usage.'
   run_foreground rtk gain --watch
 }
 
@@ -162,24 +164,24 @@ rtk_monitor() {
 # evitando que espaços ou caracteres especiais sejam avaliados como shell.
 rtk_open_monitor() {
   local rtk_bin
-  header 'RTK · monitor em outra janela do Terminal'
+  header_ui 'RTK · monitor em outra janela do Terminal' 'RTK · monitor in another Terminal window'
   rtk_identity || return 1
   if ! bounded_capture 10 rtk gain --help; then
-    warn 'Não foi possível conferir --watch nesta versão.'
+    warn "$(ui 'Não foi possível conferir --watch nesta versão.' 'Could not check --watch support in this version.')"
     return 1
   fi
   case "$CAPTURE" in
     *--watch*) ;;
-    *) warn 'Sua versão do RTK não suporta --watch.'; return 1 ;;
+    *) warn "$(ui 'Sua versão do RTK não suporta --watch.' 'Your RTK version does not support --watch.')"; return 1 ;;
   esac
   rtk_bin="$(command -v rtk)"
   # Se a CLI for uma função shell em vez de um executável, não crie sessão falsa.
   [ -f "$rtk_bin" ] && [ -x "$rtk_bin" ] || {
-    warn 'Não identifiquei o executável do RTK. Abra outro Terminal e execute: rtk gain --watch'
+    warn "$(ui 'Não identifiquei o executável do RTK. Abra outro Terminal e execute: rtk gain --watch' 'Could not identify the RTK executable. Open another Terminal and run: rtk gain --watch')"
     return 1
   }
   if ! command -v osascript >/dev/null 2>&1; then
-    warn 'AppleScript indisponível. Abra outro Terminal e execute: rtk gain --watch'
+    warn "$(ui 'AppleScript indisponível. Abra outro Terminal e execute: rtk gain --watch' 'AppleScript is unavailable. Open another Terminal and run: rtk gain --watch')"
     return 1
   fi
   if RTK_MONITOR_BIN="$rtk_bin" osascript \
@@ -188,34 +190,34 @@ rtk_open_monitor() {
       -e 'activate' \
       -e 'do script ((quoted form of rtkExecutable) & " gain --watch")' \
       -e 'end tell' >/dev/null; then
-    say 'Janela do Terminal solicitada com o monitor RTK.'
-    say 'Deixe-a aberta e utilize Codex ou Claude na janela do assistente.'
-    say 'Para ver quais comandos chegaram ao RTK: opção 8 (histórico) do menu RTK.'
+    say_ui 'Janela do Terminal solicitada com o monitor RTK.' 'Opened a Terminal window for the RTK monitor.'
+    say_ui 'Deixe-a aberta e utilize Codex ou Claude na janela do assistente.' 'Leave it open and use Codex or Claude in the assistant window.'
+    say_ui 'Para ver quais comandos chegaram ao RTK: opção 8 (histórico) do menu RTK.' 'To see commands received by RTK, open option 8 (history) in the RTK menu.'
   else
-    warn 'O macOS não abriu a janela (verifique permissões de Automação).'
-    say 'Alternativa: abra outra janela do Terminal e execute: rtk gain --watch'
+    warn "$(ui 'O macOS não abriu a janela (verifique permissões de Automação).' 'macOS did not open the window (check Automation permissions).')"
+    say_ui 'Alternativa: abra outra janela do Terminal e execute: rtk gain --watch' 'Alternatively, open another Terminal window and run: rtk gain --watch'
     return 1
   fi
 }
 
 rtk_status() {
   local RTK_INIT_HELP='' rtk_status_rc=0
-  header 'RTK · situação e economia'
+  header_ui 'RTK · situação e economia' 'RTK · status and savings'
   rtk_version || return 1
-  say "Executável: $(command -v rtk)"
+  say "$(ui 'Executável' 'Executable'): $(command -v rtk)"
   say ''
-  say 'Ganhos registrados pelo próprio RTK:'
+  say_ui 'Ganhos registrados pelo próprio RTK:' 'Savings recorded by RTK:'
   if ! bounded_capture 10 rtk gain; then
-    warn 'Economia indisponível. Vou consultar as integrações separadamente.'
+    warn "$(ui 'Economia indisponível. Vou consultar as integrações separadamente.' 'Savings unavailable. Checking integrations separately.')"
     rtk_status_rc=1
   fi
   say "$CAPTURE"
   say ''
-  say 'Integrações informadas pelo RTK:'
-  [ -z "${PROJECT:-}" ] || say "Contexto local: $PROJECT"
+  say_ui 'Integrações informadas pelo RTK:' 'Integrations reported by RTK:'
+  [ -z "${PROJECT:-}" ] || say "$(ui 'Contexto local' 'Local context'): $PROJECT"
   if ! bounded_capture 10 rtk init --help; then
     say "$CAPTURE"
-    warn 'Não consegui conferir os comandos desta versão do RTK.'
+    warn "$(ui 'Não consegui conferir os comandos desta versão do RTK.' 'Could not check the commands supported by this RTK version.')"
     return 1
   fi
   RTK_INIT_HELP="$CAPTURE"
@@ -223,8 +225,8 @@ rtk_status() {
   say ''
   rtk_show_agent claude || rtk_status_rc=1
   say ''
-  say 'Instalado e ligado ao agente são coisas diferentes. Leia a situação acima.'
-  say 'A economia depende dos comandos usados; não é todo o consumo do agente.'
+  say_ui 'Instalado e ligado ao agente são coisas diferentes. Leia a situação acima.' 'Installed and connected to an agent are different states. Read the status above.'
+  say_ui 'A economia depende dos comandos usados; não é todo o consumo do agente.' 'Savings depend on the commands used; they are not total agent usage.'
   return "$rtk_status_rc"
 }
 
@@ -320,23 +322,23 @@ rtk_update_notice() {
   # Programa trocado depois da consulta (atualizado por fora): aguarda a próxima.
   [ ! "$(rtk_bin_path)" -nt "$(rtk_update_cache)" ] || return 0
   rtk_tag_newer "$RTK_CACHED_LATEST" "$RTK_CACHED_INSTALLED" || return 0
-  printf 'RTK %s disponível (você tem %s) → menu 7 → 2 → 10\n' "$RTK_CACHED_LATEST" "$RTK_CACHED_INSTALLED"
+  printf '%s\n' "$(ui "RTK $RTK_CACHED_LATEST disponível (você tem $RTK_CACHED_INSTALLED) → menu 7 → 2 → 10" "RTK $RTK_CACHED_LATEST available (installed: $RTK_CACHED_INSTALLED) → menu 7 → 2 → 10")"
 }
 
 # Instalador oficial DA VERSÃO indicada; o próprio script confere o SHA-256.
 rtk_run_installer() {
   local rtk_tag="$1" rtk_tmp='' rtk_script='' rtk_rc=0
-  rtk_valid_tag "$rtk_tag" || { warn 'Versão do RTK inválida; nada foi baixado.'; return 1; }
+  rtk_valid_tag "$rtk_tag" || { warn "$(ui 'Versão do RTK inválida; nada foi baixado.' 'Invalid RTK version; nothing was downloaded.')"; return 1; }
   rtk_tmp="$(mktemp -d "${TMPDIR:-/tmp}/assistente-rtk.XXXXXXXX")" || return 1
   rtk_script="$rtk_tmp/install.sh"
   if ! curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' \
       --tlsv1.2 --connect-timeout 15 --max-time 60 \
       "https://raw.githubusercontent.com/rtk-ai/rtk/$rtk_tag/install.sh" \
       --output "$rtk_script"; then
-    warn 'Não foi possível baixar o instalador. Verifique a internet.'
+    warn "$(ui 'Não foi possível baixar o instalador. Verifique a internet.' 'Could not download the installer. Check your internet connection.')"
     rtk_rc=1
   elif ! /bin/sh -n "$rtk_script"; then
-    warn 'O instalador baixado não passou na verificação de sintaxe.'
+    warn "$(ui 'O instalador baixado não passou na verificação de sintaxe.' 'The downloaded installer failed the syntax check.')"
     rtk_rc=1
   else
     # Never inherit a checksum bypass from the invoking shell.
@@ -349,64 +351,66 @@ rtk_run_installer() {
 }
 
 rtk_update() {
-  local rtk_bin=''
-  header 'RTK · verificar e instalar atualização'
+  local rtk_bin='' rtk_token
+  rtk_token="$(ui ATUALIZAR UPDATE)"
+  header_ui 'RTK · verificar e instalar atualização' 'RTK · check for and install an update'
   rtk_identity || return 1
-  rtk_installed_tag || { warn 'Não consegui ler a versão instalada do RTK.'; return 1; }
-  say 'Consultando a última versão publicada no GitHub do RTK...'
-  rtk_latest_tag || { warn 'Não consegui consultar agora (internet ou GitHub indisponível).'; return 1; }
+  rtk_installed_tag || { warn "$(ui 'Não consegui ler a versão instalada do RTK.' 'Could not read the installed RTK version.')"; return 1; }
+  say_ui 'Consultando a última versão publicada no GitHub do RTK...' 'Checking the latest RTK release on GitHub...'
+  rtk_latest_tag || { warn "$(ui 'Não consegui consultar agora (internet ou GitHub indisponível).' 'Could not check now (internet or GitHub unavailable).')"; return 1; }
   put "$(rtk_update_cache)" "$RTK_INSTALLED $RTK_LATEST $(date +%s)" >/dev/null 2>&1
   if ! rtk_tag_newer "$RTK_LATEST" "$RTK_INSTALLED"; then
-    say "Você já está na versão mais recente ($RTK_INSTALLED)."
+    say "$(ui "Você já está na versão mais recente ($RTK_INSTALLED)." "You already have the latest version ($RTK_INSTALLED).")"
     return 0
   fi
-  say "Versão nova: $RTK_LATEST (você tem $RTK_INSTALLED)."
+  say "$(ui "Versão nova: $RTK_LATEST (você tem $RTK_INSTALLED)." "New version: $RTK_LATEST (installed: $RTK_INSTALLED).")"
   rtk_bin="$(rtk_bin_path)"
   if command -v brew >/dev/null 2>&1 && bounded_capture 20 brew list --versions rtk-oss; then
-    say 'Instalado pelo Homebrew. Comando: brew upgrade rtk-ai/tap/rtk-oss'
-    ask 'Digite ATUALIZAR para continuar: ' || return 1
-    [ "$REPLY" = ATUALIZAR ] || { say 'Atualização cancelada.'; return 0; }
+    say_ui 'Instalado pelo Homebrew. Comando: brew upgrade rtk-ai/tap/rtk-oss' 'Installed with Homebrew. Command: brew upgrade rtk-ai/tap/rtk-oss'
+    ask "$(ui "Digite $rtk_token para continuar: " "Type $rtk_token to continue: ")" || return 1
+    [ "$REPLY" = "$rtk_token" ] || { say_ui 'Atualização cancelada.' 'Update canceled.'; return 0; }
     run_foreground brew upgrade rtk-ai/tap/rtk-oss || return $?
   elif [ "$rtk_bin" = "$HOME/.local/bin/rtk" ]; then
-    say "Instalado pelo instalador oficial. Vou usar o instalador da versão $RTK_LATEST."
-    say 'O instalador confere o SHA-256 do programa antes de substituir.'
-    ask 'Digite ATUALIZAR para continuar: ' || return 1
-    [ "$REPLY" = ATUALIZAR ] || { say 'Atualização cancelada.'; return 0; }
+    say "$(ui "Instalado pelo instalador oficial. Vou usar o instalador da versão $RTK_LATEST." "Installed with the official installer. I will use the installer for $RTK_LATEST.")"
+    say_ui 'O instalador confere o SHA-256 do programa antes de substituir.' 'The installer checks the program SHA-256 before replacing it.'
+    ask "$(ui "Digite $rtk_token para continuar: " "Type $rtk_token to continue: ")" || return 1
+    [ "$REPLY" = "$rtk_token" ] || { say_ui 'Atualização cancelada.' 'Update canceled.'; return 0; }
     rtk_run_installer "$RTK_LATEST" || return $?
   else
-    warn "O rtk em $rtk_bin foi instalado de outro jeito. Atualize pelo mesmo método."
+    warn "$(ui "O rtk em $rtk_bin foi instalado de outro jeito. Atualize pelo mesmo método." "rtk at $rtk_bin was installed another way. Update it with the same method.")"
     return 1
   fi
   rm -f "$(rtk_update_cache)"
   say ''
-  say 'Atualização concluída. Versão agora:'
+  say_ui 'Atualização concluída. Versão agora:' 'Update complete. Current version:'
   rtk_version || return 1
-  say 'Reinicie as conversas do agente para usar a versão nova.'
+  say_ui 'Reinicie as conversas do agente para usar a versão nova.' 'Restart agent conversations to use the new version.'
 }
 
 rtk_install() {
-  local rtk_method=''
-  header 'Instalar RTK OSS'
+  local rtk_method='' rtk_token
+  rtk_token="$(ui INSTALAR INSTALL)"
+  header_ui 'Instalar RTK OSS' 'Install RTK OSS'
   if rtk_present; then
-    say "Já existe rtk em: $(command -v rtk)"
+    say "$(ui 'Já existe rtk em' 'rtk already exists at'): $(command -v rtk)"
     rtk_identity || return 1
-    say 'RTK identificado. Para atualizar: opção 10 deste menu RTK.'
-    say 'Para usar no agente, escolha Ativar integração neste menu.'
+    say_ui 'RTK identificado. Para atualizar: opção 10 deste menu RTK.' 'RTK found. To update, use option 10 in this RTK menu.'
+    say_ui 'Para usar no agente, escolha Ativar integração neste menu.' 'To use it with an agent, choose Enable integration in this menu.'
     return 0
   fi
   if rtk_install_target_exists; then
-    warn 'Já existe ~/.local/bin/rtk fora do PATH ou sem permissão de execução.'
-    say 'Confira esse arquivo antes de instalar. O kit não vai sobrescrevê-lo.'
+    warn "$(ui 'Já existe ~/.local/bin/rtk fora do PATH ou sem permissão de execução.' '~/.local/bin/rtk already exists outside PATH or is not executable.')"
+    say_ui 'Confira esse arquivo antes de instalar. O kit não vai sobrescrevê-lo.' 'Check that file before installing. The toolkit will not overwrite it.'
     return 1
   fi
-  say 'RTK reduz a saída de comandos enviados ao agente. Não é modelo nem login.'
-  say 'Edição aberta (OSS): filtros e ligações sob Apache-2.0; sem o motor BUSL.'
+  say_ui 'RTK reduz a saída de comandos enviados ao agente. Não é modelo nem login.' 'RTK shortens command output sent to an agent. It is not a model or login.'
+  say_ui 'Edição aberta (OSS): filtros e ligações sob Apache-2.0; sem o motor BUSL.' 'Open source edition: filters and integrations under Apache-2.0, without the BUSL engine.'
   say ''
-  say '  1) Instalador oficial · sem precisar de Homebrew'
-  say '  2) Homebrew · se já estiver instalado'
-  say '  3) Ver documentação oficial'
-  say '  0) Voltar'
-  ask 'Escolha [1]: ' || return 1
+  say_ui '  1) Instalador oficial · sem precisar de Homebrew' '  1) Official installer · no Homebrew needed'
+  say_ui '  2) Homebrew · se já estiver instalado' '  2) Homebrew · if already installed'
+  say_ui '  3) Ver documentação oficial' '  3) View official documentation'
+  say_ui '  0) Voltar' '  0) Back'
+  ask_ui 'Escolha [1]: ' 'Choose [1]: ' || return 1
   rtk_method="${REPLY:-1}"
   case "$rtk_method" in
     0) return 0 ;;
@@ -414,36 +418,36 @@ rtk_install() {
       say 'https://www.rtk-ai.app/docs/getting-started/installation/'
       return 0 ;;
     1)
-      command -v curl >/dev/null 2>&1 || { warn 'curl não encontrado.'; return 1; }
+      command -v curl >/dev/null 2>&1 || { warn "$(ui 'curl não encontrado.' 'curl was not found.')"; return 1; }
       if ! command -v shasum >/dev/null 2>&1 && ! command -v sha256sum >/dev/null 2>&1; then
-        warn 'Falta um utilitário SHA-256. A instalação foi cancelada.'
+        warn "$(ui 'Falta um utilitário SHA-256. A instalação foi cancelada.' 'No SHA-256 utility was found. Installation canceled.')"
         return 1
       fi
-      say 'Origem: instalador oficial da última versão publicada (não da branch master).'
-      say 'Destino: ~/.local/bin/rtk · edição OSS · sem sudo.'
-      say 'O script oficial verifica o SHA-256 do binário baixado.'
-      ask 'Digite INSTALAR para baixar e executar o instalador oficial: ' || return 1
-      [ "$REPLY" = INSTALAR ] || { say 'Instalação cancelada.'; return 0; }
-      rtk_latest_tag || { warn 'Não consegui consultar a última versão. Verifique a internet.'; return 1; }
-      say "Versão: $RTK_LATEST"
+      say_ui 'Origem: instalador oficial da última versão publicada (não da branch master).' 'Source: official installer from the latest release (not the master branch).'
+      say_ui 'Destino: ~/.local/bin/rtk · edição OSS · sem sudo.' 'Destination: ~/.local/bin/rtk · OSS edition · no sudo.'
+      say_ui 'O script oficial verifica o SHA-256 do binário baixado.' 'The official script verifies the downloaded binary SHA-256.'
+      ask "$(ui "Digite $rtk_token para baixar e executar o instalador oficial: " "Type $rtk_token to download and run the official installer: ")" || return 1
+      [ "$REPLY" = "$rtk_token" ] || { say_ui 'Instalação cancelada.' 'Installation canceled.'; return 0; }
+      rtk_latest_tag || { warn "$(ui 'Não consegui consultar a última versão. Verifique a internet.' 'Could not check the latest version. Check your internet connection.')"; return 1; }
+      say "$(ui 'Versão' 'Version'): $RTK_LATEST"
       rtk_run_installer "$RTK_LATEST" || return $?
       ;;
     2)
-      command -v brew >/dev/null 2>&1 || { warn 'Homebrew não encontrado. Use o instalador oficial (1).'; return 1; }
-      say 'Comando: brew install rtk-ai/tap/rtk-oss'
-      ask 'Digite INSTALAR para continuar: ' || return 1
-      [ "$REPLY" = INSTALAR ] || { say 'Instalação cancelada.'; return 0; }
+      command -v brew >/dev/null 2>&1 || { warn "$(ui 'Homebrew não encontrado. Use o instalador oficial (1).' 'Homebrew was not found. Use the official installer (1).')"; return 1; }
+      say_ui 'Comando: brew install rtk-ai/tap/rtk-oss' 'Command: brew install rtk-ai/tap/rtk-oss'
+      ask "$(ui "Digite $rtk_token para continuar: " "Type $rtk_token to continue: ")" || return 1
+      [ "$REPLY" = "$rtk_token" ] || { say_ui 'Instalação cancelada.' 'Installation canceled.'; return 0; }
       run_foreground brew install rtk-ai/tap/rtk-oss || return $?
       ;;
-    *) warn 'Escolha uma das opções mostradas.'; return 1 ;;
+    *) warn "$(ui 'Escolha uma das opções mostradas.' 'Choose one of the displayed options.')"; return 1 ;;
   esac
   hash -r 2>/dev/null || true
   if rtk_identity; then
-    say 'RTK instalado e identificado. A instalação não ligou o RTK aos agentes.'
-    say 'Próximo passo: Ativar integração para Codex ou Claude neste menu.'
+    say_ui 'RTK instalado e identificado. A instalação não ligou o RTK aos agentes.' 'RTK is installed and verified. Installation did not connect it to agents.'
+    say_ui 'Próximo passo: Ativar integração para Codex ou Claude neste menu.' 'Next: Enable integration for Codex or Claude in this menu.'
   else
-    warn 'O instalador terminou, mas não foi possível confirmar o RTK.'
-    say 'Reabra o Terminal e confira rtk --version e rtk gain.'
+    warn "$(ui 'O instalador terminou, mas não foi possível confirmar o RTK.' 'The installer finished, but RTK could not be verified.')"
+    say_ui 'Reabra o Terminal e confira rtk --version e rtk gain.' 'Reopen Terminal and check rtk --version and rtk gain.'
     return 1
   fi
 }
@@ -476,55 +480,55 @@ rtk_mark_on() { rm -f "$(rtk_off_marker "$1")" 2>/dev/null; return 0; }
 
 rtk_state_line() {
   local rtk_tool="${1:-$TOOL}"
-  if ! rtk_present; then say 'RTK: não instalado'; return 0; fi
-  if rtk_hook_active "$rtk_tool"; then say 'RTK: ativo ✓'
-  elif rtk_is_off "$rtk_tool"; then say 'RTK: desligado por você'
-  else say 'RTK: instalado, ainda não ativo neste agente'; fi
+  if ! rtk_present; then say_ui 'RTK: não instalado' 'RTK: not installed'; return 0; fi
+  if rtk_hook_active "$rtk_tool"; then say_ui 'RTK: ativo ✓' 'RTK: active ✓'
+  elif rtk_is_off "$rtk_tool"; then say_ui 'RTK: desligado por você' 'RTK: disabled by you'
+  else say_ui 'RTK: instalado, ainda não ativo neste agente' 'RTK: installed, not yet active for this agent'; fi
 }
 
 # Nunca bloqueia nem falha o lançamento do agente.
 rtk_autostart() {
   if ! rtk_present; then
-    say 'RTK: não instalado (menu 7 → 2 instala; opcional).'
+    say_ui 'RTK: não instalado (menu 7 → 2 instala; opcional).' 'RTK: not installed (menu 7 → 2 installs it; optional).'
     return 0
   fi
-  if rtk_hook_active "$TOOL"; then say 'RTK: ativo ✓'; return 0; fi
+  if rtk_hook_active "$TOOL"; then say_ui 'RTK: ativo ✓' 'RTK: active ✓'; return 0; fi
   if rtk_is_off "$TOOL"; then
-    say 'RTK: desligado por sua escolha (menu 7 → 2 → 3 religa).'
+    say_ui 'RTK: desligado por sua escolha (menu 7 → 2 → 3 religa).' 'RTK: disabled by you (menu 7 → 2 → 3 enables it again).'
     return 0
   fi
-  say "RTK não está ativo no $TOOL."
-  ask 'Ativar agora (muda a configuração global do agente)? [S/n, Enter = sim]: ' || return 0
+  say "$(ui 'RTK não está ativo no' 'RTK is not active for') $TOOL."
+  ask_ui 'Ativar agora (muda a configuração global do agente)? [S/n, Enter = sim]: ' 'Enable it now (changes global agent settings)? [Y/n, Enter = yes]: ' || return 0
   case "$REPLY" in
-    ''|s|S|sim|Sim|SIM) ;;
-    n|N|nao|não|NAO|NÃO|Nao|Não) rtk_mark_off "$TOOL"; say 'Ok. Não vou perguntar de novo (menu 7 → 2 → 3 religa).'; return 0 ;;
-    *) say 'Resposta não reconhecida: não ativei agora. Vou perguntar de novo na próxima conversa.'; return 0 ;;
+    ''|s|S|sim|Sim|SIM|y|Y|yes|Yes|YES) ;;
+    n|N|no|No|NO|nao|não|NAO|NÃO|Nao|Não) rtk_mark_off "$TOOL"; say_ui 'Ok. Não vou perguntar de novo (menu 7 → 2 → 3 religa).' 'OK. I will not ask again (menu 7 → 2 → 3 enables it again).'; return 0 ;;
+    *) say_ui 'Resposta não reconhecida: não ativei agora. Vou perguntar de novo na próxima conversa.' 'Unrecognized answer: RTK was not enabled. I will ask again next time.'; return 0 ;;
   esac
-  if rtk_toggle "$TOOL" ativar confirmado; then say 'RTK: ativo ✓'
-  else warn 'Não consegui ativar o RTK agora; seguindo sem ele (menu 7 → 2 para tentar de novo).'; fi
+  if rtk_toggle "$TOOL" ativar confirmado; then say_ui 'RTK: ativo ✓' 'RTK: active ✓'
+  else warn "$(ui 'Não consegui ativar o RTK agora; seguindo sem ele (menu 7 → 2 para tentar de novo).' 'Could not enable RTK now; continuing without it (menu 7 → 2 to retry).')"; fi
   return 0
 }
 
 rtk_toggle() {
-  local rtk_tool="$1" rtk_action="$2" rtk_confirmed="${3:-}" rtk_token='' rtk_rc=0
+  local rtk_tool="$1" rtk_action="$2" rtk_confirmed="${3:-}" rtk_token='' rtk_action_en='' rtk_rc=0
   local RTK_INIT_HELP=''
   local -a rtk_args
   rtk_args=(init --global)
   case "$rtk_tool" in
     codex) rtk_args+=(--codex) ;;
     claude) ;;
-    *) warn 'Ferramenta inválida para a integração RTK.'; return 1 ;;
+    *) warn "$(ui 'Ferramenta inválida para a integração RTK.' 'Invalid agent for RTK integration.')"; return 1 ;;
   esac
   case "$rtk_action" in
-    ativar) rtk_token=ATIVAR ;;
-    desativar) rtk_args+=(--uninstall); rtk_token=DESATIVAR ;;
-    *) warn 'Ação inválida para a integração RTK.'; return 1 ;;
+    ativar) rtk_token="$(ui ATIVAR ENABLE)"; rtk_action_en=enable ;;
+    desativar) rtk_args+=(--uninstall); rtk_token="$(ui DESATIVAR DISABLE)"; rtk_action_en=disable ;;
+    *) warn "$(ui 'Ação inválida para a integração RTK.' 'Invalid RTK integration action.')"; return 1 ;;
   esac
-  [ "$rtk_confirmed" != confirmado ] && header "RTK · $rtk_action no $rtk_tool"
+  [ "$rtk_confirmed" != confirmado ] && header "RTK · $(ui "$rtk_action" "$rtk_action_en") $(ui 'no' 'for') $rtk_tool"
   rtk_identity || return 1
   if ! bounded_capture 10 rtk init --help; then
     say "$CAPTURE"
-    warn 'Não foi possível conferir os comandos desta versão do RTK.'
+    warn "$(ui 'Não foi possível conferir os comandos desta versão do RTK.' 'Could not check the commands supported by this RTK version.')"
     return 1
   fi
   RTK_INIT_HELP="$CAPTURE"
@@ -534,38 +538,38 @@ rtk_toggle() {
   [ "$rtk_tool" != codex ] || rtk_help_supports --codex || return 1
   [ "$rtk_action" != desativar ] || rtk_help_supports --uninstall || return 1
   if [ "$rtk_confirmed" != confirmado ]; then
-    say 'Escopo GLOBAL: esta alteração também vale fora deste kit.'
-    say 'Feche as conversas do agente e abra novamente depois da alteração.'
-    say 'A ferramenta mantém as verificações de permissão do próprio agente.'
-    say 'Se o RTK oferecer recursos opcionais, leia cada pergunta antes de aceitar.'
+    say_ui 'Escopo GLOBAL: esta alteração também vale fora deste kit.' 'GLOBAL scope: this change also applies outside this toolkit.'
+    say_ui 'Feche as conversas do agente e abra novamente depois da alteração.' 'Close and reopen agent conversations after the change.'
+    say_ui 'A ferramenta mantém as verificações de permissão do próprio agente.' 'The agent keeps its own permission checks.'
+    say_ui 'Se o RTK oferecer recursos opcionais, leia cada pergunta antes de aceitar.' 'If RTK offers optional features, read each prompt before accepting.'
     say ''
-    say 'Prévia oficial das alterações:'
+    say_ui 'Prévia oficial das alterações:' 'Official preview of changes:'
   fi
   if ! bounded_capture 15 rtk "${rtk_args[@]}" --dry-run; then
     say "$CAPTURE"
-    warn 'A prévia falhou. Nenhuma aplicação foi iniciada pelo kit.'
+    warn "$(ui 'A prévia falhou. Nenhuma aplicação foi iniciada pelo kit.' 'The preview failed. The toolkit did not apply any changes.')"
     return 1
   fi
   if [ "$rtk_confirmed" != confirmado ]; then
     say "$CAPTURE"
     say ''
-    ask "Digite $rtk_token para aplicar esta alteração global: " || return 1
-    [ "$REPLY" = "$rtk_token" ] || { say 'Alteração cancelada.'; return 0; }
+    ask "$(ui "Digite $rtk_token para aplicar esta alteração global: " "Type $rtk_token to apply this global change: ")" || return 1
+    [ "$REPLY" = "$rtk_token" ] || { say_ui 'Alteração cancelada.' 'Change canceled.'; return 0; }
   fi
   run_foreground rtk "${rtk_args[@]}" || rtk_rc=$?
   if [ "$rtk_rc" -ne 0 ]; then
-    warn 'O RTK informou um erro. Confira a saída acima antes de tentar novamente.'
+    warn "$(ui 'O RTK informou um erro. Confira a saída acima antes de tentar novamente.' 'RTK reported an error. Check the output above before retrying.')"
     return "$rtk_rc"
   fi
   if [ "$rtk_action" = desativar ]; then rtk_mark_off "$rtk_tool"; else rtk_mark_on "$rtk_tool"; fi
   say ''
-  say 'Comando concluído. Confira os avisos e a situação da ligação abaixo:'
+  say_ui 'Comando concluído. Confira os avisos e a situação da ligação abaixo:' 'Command completed. Check the notices and integration status below:'
   if ! rtk_show_agent "$rtk_tool"; then
-    warn 'Não foi possível confirmar a ligação. Use a opção 2 deste menu RTK.'
+    warn "$(ui 'Não foi possível confirmar a ligação. Use a opção 2 deste menu RTK.' 'Could not confirm the integration. Use option 2 in this RTK menu.')"
     return 1
   fi
-  say 'Reinicie o agente para aplicar. Projetos com ligação própria não mudam.'
-  say 'Desativar a integração mantém o programa rtk instalado para uso manual.'
+  say_ui 'Reinicie o agente para aplicar. Projetos com ligação própria não mudam.' 'Restart the agent to apply. Projects with their own integration are unchanged.'
+  say_ui 'Desativar a integração mantém o programa rtk instalado para uso manual.' 'Disabling integration leaves the rtk program installed for manual use.'
 }
 
 rtk_menu() {
@@ -617,20 +621,20 @@ rtk_menu() {
         ;;
       5)
         say ''
-        say 'O RTK encurta a saída de comandos do agente (textos repetitivos).'
-        say 'Exemplo: um git status é executado como rtk git status.'
-        say 'Use os agentes normalmente depois de instalar e ativar o RTK.'
-        say 'Ele não muda sua conta nem escolhe modelos, e não garante uma'
-        say 'economia fixa.'
-        say 'Ele funciona sem nenhum programa rodando em segundo plano no macOS.'
-        say 'Monitor em outra janela: opção 7 deste menu RTK, ou rtk gain --watch'
-        say 'em um Terminal separado.'
-        say 'Uso real: rtk gain --history (opção 8 deste menu RTK); teste de'
-        say 'entendimento do comando: opção 9.'
-        say 'Economia: rtk gain · situação Codex: rtk init --codex --show'
-        say 'Situação Claude: rtk init --show'
-        say 'Se uma saída compactada esconder um detalhe, confira a saída original.'
-        say 'Documentação: https://www.rtk-ai.app/docs/getting-started/quick-start/'
+        say_ui 'O RTK encurta a saída de comandos do agente (textos repetitivos).' 'RTK shortens repetitive agent command output.'
+        say_ui 'Exemplo: um git status é executado como rtk git status.' 'Example: git status is run as rtk git status.'
+        say_ui 'Use os agentes normalmente depois de instalar e ativar o RTK.' 'Use the agents normally after installing and enabling RTK.'
+        say_ui 'Ele não muda sua conta nem escolhe modelos, e não garante uma' 'It does not change your account or choose models, and it cannot'
+        say_ui 'economia fixa.' 'guarantee a fixed saving.'
+        say_ui 'Ele funciona sem nenhum programa rodando em segundo plano no macOS.' 'It runs without a macOS background service.'
+        say_ui 'Monitor em outra janela: opção 7 deste menu RTK, ou rtk gain --watch' 'Monitor in another window: option 7 here, or rtk gain --watch'
+        say_ui 'em um Terminal separado.' 'in a separate Terminal.'
+        say_ui 'Uso real: rtk gain --history (opção 8 deste menu RTK); teste de' 'Actual usage: rtk gain --history (option 8 here); test command'
+        say_ui 'entendimento do comando: opção 9.' 'rewriting with option 9.'
+        say_ui 'Economia: rtk gain · situação Codex: rtk init --codex --show' 'Savings: rtk gain · Codex status: rtk init --codex --show'
+        say_ui 'Situação Claude: rtk init --show' 'Claude status: rtk init --show'
+        say_ui 'Se uma saída compactada esconder um detalhe, confira a saída original.' 'If compact output hides detail, check the original output.'
+        say_ui 'Documentação: https://www.rtk-ai.app/docs/getting-started/quick-start/' 'Documentation: https://www.rtk-ai.app/docs/getting-started/quick-start/'
         pause || return 1
         ;;
       *) warn 'Escolha uma das opções mostradas.'; pause || return 1 ;;

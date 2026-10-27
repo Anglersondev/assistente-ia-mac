@@ -140,6 +140,21 @@ sys.exit(int(os.environ.get("TEST_CODE_STATUS", "0")))
         for name, prompt in (("encerrar", "ENCERRAR-SESSAO"), ("resumo", "RESUMO-RAPIDO")):
             self.assertIn(f"@PROMPTS/{prompt}.md", (project / f".claude/commands/{name}.md").read_text())
 
+    def test_english_shortcuts_use_english_names_and_instructions(self):
+        self.env["ASSISTENTE_LANG"] = "en"
+        for tool in ("claude", "codex"):
+            with self.subTest(tool=tool):
+                project = self.managed_project(tool)
+                self.assert_ok(self.project_shell(project, f"TOOL={tool}; create_project_shortcuts"))
+                if tool == "claude":
+                    self.assertIn("@PROMPTS/ENCERRAR-SESSAO.md", (project / ".claude/commands/wrap-up.md").read_text())
+                    self.assertTrue((project / ".claude/commands/summary.md").exists())
+                else:
+                    skill = (project / ".agents/skills/wrap-up/SKILL.md").read_text()
+                    self.assertIn("name: wrap-up", skill)
+                    self.assertIn("Use this skill only", skill)
+                    self.assertTrue((project / ".agents/skills/summary/SKILL.md").exists())
+
     def test_m08_claude_commands_reject_symlinks_and_directories_before_any_write(self):
         outside = self.parent / "Comandos externos"
         outside.mkdir()

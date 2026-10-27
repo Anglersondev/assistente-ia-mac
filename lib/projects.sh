@@ -477,17 +477,18 @@ write_new_file_atomic() {
 }
 
 create_project_shortcuts() {
-  local path name profile root relative prompt description dirs=() files=()
+  local path name profile root relative prompt description close_name=encerrar summary_name=resumo dirs=() files=()
   [ ! -L "$PROJECT" ] || { warn 'A pasta do projeto é um link simbólico. Nada foi criado.'; return 1; }
+  if [ "$APP_LANG" = en ]; then close_name=wrap-up; summary_name=summary; fi
   case "$TOOL" in
     claude)
       root=.claude/commands
       dirs=(.claude .claude/commands)
-      files=(.claude/commands/encerrar.md .claude/commands/resumo.md) ;;
+      files=(".claude/commands/$close_name.md" ".claude/commands/$summary_name.md") ;;
     codex)
       root=.agents/skills
-      dirs=(.agents .agents/skills .agents/skills/encerrar .agents/skills/resumo)
-      files=(.agents/skills/encerrar/SKILL.md .agents/skills/resumo/SKILL.md) ;;
+      dirs=(.agents .agents/skills ".agents/skills/$close_name" ".agents/skills/$summary_name")
+      files=(".agents/skills/$close_name/SKILL.md" ".agents/skills/$summary_name/SKILL.md") ;;
     *) return 1 ;;
   esac
   profile="$(project_profile)" || return 1
@@ -506,7 +507,7 @@ create_project_shortcuts() {
     fi
   done
   if [ "$TOOL" = claude ]; then
-    for name in encerrar resumo; do safe_project_path ".claude/skills/$name" || return 1; done
+    for name in "$close_name" "$summary_name"; do safe_project_path ".claude/skills/$name" || return 1; done
   fi
   for path in PROMPTS/ENCERRAR-SESSAO.md PROMPTS/RESUMO-RAPIDO.md; do
     safe_project_path "$path" || return 1
@@ -515,35 +516,35 @@ create_project_shortcuts() {
   for path in "${dirs[@]}"; do
     safe_project_path "$path" && mkdir -p "$PROJECT/$path" || return 1
   done
-  for name in encerrar resumo; do
+  for name in "$close_name" "$summary_name"; do
     if [ "$TOOL" = claude ]; then
       relative="$root/$name.md"
       if [ -e "$PROJECT/.claude/skills/$name" ]; then
-        warn "Já existe a skill .claude/skills/$name; o comando /$name não foi criado para evitar conflito."
+        warn "$(ui "Já existe a skill .claude/skills/$name; o comando /$name não foi criado para evitar conflito." "The .claude/skills/$name skill already exists; /$name was not created to avoid a conflict.")"
         continue
       fi
     else relative="$root/$name/SKILL.md"; fi
     if [ -e "$PROJECT/$relative" ]; then
-      say "Preservado $relative (já existe)."
+      say "$(ui 'Preservado' 'Preserved') $relative ($(ui 'já existe' 'already exists'))."
       continue
     fi
     case "$name" in
-      encerrar) prompt=PROMPTS/ENCERRAR-SESSAO.md; description='Encerrar a sessão e registrar o andamento quando o usuário pedir para encerrar o trabalho.' ;;
-      resumo) prompt=PROMPTS/RESUMO-RAPIDO.md; description='Resumir o contexto da conversa quando o usuário pedir um resumo para continuar em outra sessão.' ;;
+      encerrar|wrap-up) prompt=PROMPTS/ENCERRAR-SESSAO.md; description="$(ui 'Encerrar a sessão e registrar o andamento quando o usuário pedir para encerrar o trabalho.' 'Wrap up the session and record progress when the user asks to finish the work.')" ;;
+      resumo|summary) prompt=PROMPTS/RESUMO-RAPIDO.md; description="$(ui 'Resumir o contexto da conversa quando o usuário pedir um resumo para continuar em outra sessão.' 'Summarize conversation context when the user asks for a handoff to another session.')" ;;
     esac
     if [ "$TOOL" = claude ]; then
       printf '@%s\n' "$prompt" | write_new_file_atomic "$relative" || return 1
     else
       printf '%s\n' '---' "name: $name" "description: $description" '---' '' \
-        'Use esta skill somente quando o usuário pedir esta ação.' \
-        "Leia $prompt a partir da raiz deste projeto e execute o pedido desse arquivo." \
-        'Preserve o trabalho existente e registre apenas fatos confirmados.' | write_new_file_atomic "$relative" || return 1
+        "$(ui 'Use esta skill somente quando o usuário pedir esta ação.' 'Use this skill only when the user requests this action.')" \
+        "$(ui "Leia $prompt a partir da raiz deste projeto e execute o pedido desse arquivo." "Read $prompt from this project root and carry out that request.")" \
+        "$(ui 'Preserve o trabalho existente e registre apenas fatos confirmados.' 'Preserve existing work and record only confirmed facts.')" | write_new_file_atomic "$relative" || return 1
     fi
-    say "Criado $relative."
+    say "$(ui 'Criado' 'Created') $relative."
   done
   if [ "$TOOL" = claude ]; then
-    say 'Abra uma nova sessão do Claude Code neste projeto; use /encerrar ou /resumo se o atalho estiver disponível.'
-  else say 'Abra uma nova sessão do Codex neste projeto; use $encerrar ou $resumo.'; fi
+    say "$(ui "Abra uma nova sessão do Claude Code neste projeto; use /$close_name ou /$summary_name se o atalho estiver disponível." "Open a new Claude Code session in this project; use /$close_name or /$summary_name if available.")"
+  else say "$(ui "Abra uma nova sessão do Codex neste projeto; use \$$close_name ou \$$summary_name." "Open a new Codex session in this project; use \$$close_name or \$$summary_name.")"; fi
 }
 
 create_claude_commands() {
