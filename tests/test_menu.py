@@ -169,6 +169,31 @@ class MenuTests(base.AssistantTests):
         self.assertIn("Cuidar do projeto", result.stdout)
         self.assertIn("INSTRUÇÕES E PEDIDOS PRONTOS", result.stdout)
 
+    def test_language_choice_persists_and_changes_main_menu(self):
+        result = self.run_main(input_text="7\n8\n2\n\n0\n0\n")
+        self.assert_ok(result)
+        self.assertEqual((self.state / "language").read_text().strip(), "en")
+        out = self.run_main(input_text="0\n").stdout
+        self.assertIn("WHAT WOULD YOU LIKE TO DO?", out)
+        self.assertIn("Projects: switch, open, or create", out)
+        self.assertNotIn("O QUE VOCÊ QUER FAZER?", out)
+
+    def test_english_project_template_and_new_project_default(self):
+        self.env["ASSISTENTE_LANG"] = "en"
+        name = "English project"
+        result = self.run_shell("create_project", f"2\n{self.parent}\n{name}\n1\n2\n\n\n")
+        self.assert_ok(result)
+        project = self.parent / "CODEX" / name
+        self.assertIn("Create project · 4 of 4", result.stdout)
+        self.assertIn("Respond in English", (project / "INSTRUCOES/PROJETO.md").read_text())
+        self.assertIn("Describe the purpose", (project / "README.md").read_text())
+        self.assertIn("Check the actual file state", (project / "PROMPTS/CONTINUAR.md").read_text())
+        self.assert_ok(self.project_shell(project, "has_real_progress && exit 1; exit 0"))
+        filled = self.project_shell(project, "fill_project_objective 'Build a website' && project_doctor", "")
+        self.assert_ok(filled)
+        self.assertIn("- Goal: Build a website", (project / "INSTRUCOES/PROJETO.md").read_text())
+        self.assertIn("Build a website", (project / "README.md").read_text())
+
 
     # ---- Rodada de usabilidade ----
     def cmd_stub(self, name, body):
