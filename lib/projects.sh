@@ -439,9 +439,9 @@ instructions_menu() {
     case "$choice" in
       1) safe_project_path INSTRUCOES/PROJETO.md || return 1
          say_ui 'Salve como texto simples, mantendo a extensão .md. Depois inicie uma nova conversa.' 'Save as plain text with the .md extension, then start a new conversation.'
-         open -a TextEdit "$PROJECT/INSTRUCOES/PROJETO.md" ;;
+         edit_path "$PROJECT/INSTRUCOES/PROJETO.md" ;;
       2) edit_instructions_terminal ;;
-      3) open "$PROJECT/INSTRUCOES" ;;
+      3) open_path "$PROJECT/INSTRUCOES" ;;
       4) create_project_shortcuts ;;
       0) return 0 ;;
       *) say_ui 'Escolha 1, 2, 3, 4 ou 0.' 'Choose 1, 2, 3, 4, or 0.' ;;

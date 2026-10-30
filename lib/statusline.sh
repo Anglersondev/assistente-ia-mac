@@ -19,7 +19,7 @@ sl_python() {
     printf '%s' "$candidate"; return 0
   fi
   candidate="$(command -v python3 2>/dev/null)" || return 1
-  if [ "$candidate" = /usr/bin/python3 ] && ! xcode-select -p >/dev/null 2>&1; then return 1; fi
+  if [ "$(uname -s)" = Darwin ] && [ "$candidate" = /usr/bin/python3 ] && ! xcode-select -p >/dev/null 2>&1; then return 1; fi
   printf '%s' "$candidate"
 }
 
