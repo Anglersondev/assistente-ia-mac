@@ -10,6 +10,8 @@
 
 ## Linux e Windows (versão 1.1)
 
+Os lançadores para Linux e Windows estão na [prévia da versão 1.1](https://github.com/Anglersondev/assistente-ia-mac/archive/refs/heads/feature/linux-windows-1.1.zip). A última release publicada ainda é o kit macOS 1.0.
+
 | Sistema | Como abrir | Requisitos |
 | --- | --- | --- |
 | macOS | `ASSISTENTE-IA-MAC.command` | Bash 3.2+ e Codex CLI ou Claude Code instalado à parte |

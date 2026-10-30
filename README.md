@@ -24,6 +24,8 @@
 
 ## Choose your system
 
+The Linux and Windows launchers are available in the [1.1 preview branch](https://github.com/Anglersondev/assistente-ia-mac/archive/refs/heads/feature/linux-windows-1.1.zip). The latest published release is still the macOS 1.0 kit.
+
 | System | Launcher | Requirements |
 | --- | --- | --- |
 | macOS | `ASSISTENTE-IA-MAC.command` | Bash 3.2+; Codex CLI or Claude Code installed separately |
