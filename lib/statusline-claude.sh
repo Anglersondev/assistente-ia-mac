@@ -97,7 +97,9 @@ sl_main() {
 
   # Registro numérico para o Painel de uso (atômico, sem seguir links simbólicos).
   [ -n "$project" ] || return 0
-  state_dir="${ASSISTENTE_STATE_DIR:-$HOME/Library/Application Support/Assistente IA Mac}"
+if [ "$(uname -s)" = Linux ]; then default_state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/assistente-ia"
+else default_state_dir="$HOME/Library/Application Support/Assistente IA Mac"; fi
+state_dir="${ASSISTENTE_STATE_DIR:-$default_state_dir}"
   k="$(printf '%s' "$project" | cksum | cut -d' ' -f1)"
   dir="$state_dir/usage"
   file="$dir/claude-$k.txt"

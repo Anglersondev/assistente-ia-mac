@@ -1,12 +1,14 @@
 #!/bin/bash
-# Assistente IA Mac 1.0 — compatível com o Bash 3.2 do macOS.
+# Assistente IA 1.0 — compatível com o Bash 3.2 do macOS e Bash no Linux.
 # Arquivos de preferências são dados, nunca código. Os CLIs conservam o terminal.
 VERSION='1.0'
 BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+PLATFORM="${ASSISTENTE_PLATFORM:-$(uname -s)}"
+case "$PLATFORM" in Linux|linux) PLATFORM=Linux; PLATFORM_LABEL=LINUX; DEFAULT_STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/assistente-ia" ;; *) PLATFORM=Darwin; PLATFORM_LABEL=MAC; DEFAULT_STATE_DIR="$HOME/Library/Application Support/Assistente IA Mac" ;; esac
 if [ "${ASSISTENTE_TEST_MODE:-}" != 1 ]; then
   export PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$HOME/.npm-global/bin:${PATH:-/usr/bin:/bin:/usr/sbin:/sbin}"
 fi
-STATE_DIR="${ASSISTENTE_STATE_DIR:-$HOME/Library/Application Support/Assistente IA Mac}"
+STATE_DIR="${ASSISTENTE_STATE_DIR:-$DEFAULT_STATE_DIR}"
 PROJECT='' PREF_DIR='' TOOL='' MODEL='' EFFORT='' WORKMODE='trabalhar' INITIAL_PROMPT='' IMAGE=''
 REPLY='' CAPTURE='' SESSIONMODE='novo'
 APP_LANG='pt-BR'
@@ -23,7 +25,9 @@ ask_ui() { ask "$(ui "$1" "$2")"; }
 header_ui() { header "$(ui "$1" "$2")"; }
 detect_system_language() {
   local languages=''
-  if command -v defaults >/dev/null 2>&1; then
+  if [ "$PLATFORM" = Linux ]; then
+    languages="${LC_ALL:-${LC_MESSAGES:-${LANG:-}}}"
+  elif command -v defaults >/dev/null 2>&1; then
     languages="$(defaults read -g AppleLanguages 2>/dev/null)" || languages=''
     [ -n "$languages" ] || languages="$(defaults read -g AppleLocale 2>/dev/null)" || languages=''
   fi
@@ -71,7 +75,7 @@ rule() {
 wrap() { printf '%s\n' "$*" | fold -s -w "$(( $(term_cols) - 6 ))" | awk 'NR == 1 { print; next } { print "    " $0 }'; }
 header() {
   if [ -t 1 ] && [ "${ASSISTENTE_TEST_MODE:-}" != 1 ]; then printf '\033[2J\033[H'; fi
-  printf '\n%s  ASSISTENTE IA · MAC %s%s\n' "$COLOR" "$VERSION" "$RESET"
+  printf '\n%s  ASSISTENTE IA · %s %s%s\n' "$COLOR" "$PLATFORM_LABEL" "$VERSION" "$RESET"
   printf '  %s\n' "$1"
   rule
   [ -z "$PROJECT" ] || [ -n "${HIDE_PROJECT_HEADER:-}" ] || printf '  %s: %s\n' "$(ui 'Projeto atual' 'Current project')" "$PROJECT"
@@ -107,6 +111,24 @@ bounded_capture() {
   return "$status"
 }
 run_foreground() { "$@"; }
+open_path() {
+  if [ "$PLATFORM" = Linux ]; then
+    command -v xdg-open >/dev/null 2>&1 && xdg-open "$1" >/dev/null 2>&1
+  else open "$1"; fi
+}
+edit_path() {
+  if [ "$PLATFORM" = Linux ]; then
+    if [ -n "${VISUAL:-${EDITOR:-}}" ]; then "${VISUAL:-$EDITOR}" "$1"
+    else open_path "$1"; fi
+  else open -a TextEdit "$1"; fi
+}
+capture_screen() {
+  if [ "$PLATFORM" = Linux ]; then
+    if command -v gnome-screenshot >/dev/null 2>&1; then gnome-screenshot -a -f "$1"
+    elif command -v grim >/dev/null 2>&1 && command -v slurp >/dev/null 2>&1; then grim -g "$(slurp)" "$1"
+    else warn "$(ui 'Instale gnome-screenshot ou grim e slurp para capturar a tela.' 'Install gnome-screenshot or grim and slurp for screenshots.')"; return 1; fi
+  else screencapture -i "$1"; fi
+}
 # Gravação atômica no mesmo diretório; não usa source/eval nas preferências.
 put() {
   local file="$1" value="$2" temporary
@@ -148,7 +170,7 @@ normalize_path() {
 choose_folder() {
   local mode chosen dialog="${1:-Escolha a pasta do seu projeto ou a pasta onde deseja criá-lo}"
   [ "$APP_LANG" != en ] || dialog='Choose your project folder or the folder where you want to create it'
-  say_ui '1) Escolher no Finder' '1) Choose in Finder'
+  if [ "$PLATFORM" = Linux ]; then say_ui '1) Escolher no seletor de pastas' '1) Choose in folder picker'; else say_ui '1) Escolher no Finder' '1) Choose in Finder'; fi
   say_ui '2) Colar ou digitar o caminho' '2) Paste or type the path'
   say_ui '0) Voltar' '0) Back'
   while ask_ui 'Como escolher a pasta? [1]: ' 'How would you like to choose the folder? [1]: '; do
@@ -156,13 +178,16 @@ choose_folder() {
     case "$mode" in
       0) return 1 ;;
       1)
-        if command -v osascript >/dev/null 2>&1; then
+        if [ "$PLATFORM" = Linux ] && command -v zenity >/dev/null 2>&1; then
+          chosen="$(zenity --file-selection --directory --title="$dialog" 2>/dev/null)" || chosen=''
+          [ -z "$chosen" ] || { CHOSEN_FOLDER="$(normalize_path "$chosen")" && return 0; }
+        elif [ "$PLATFORM" = Darwin ] && command -v osascript >/dev/null 2>&1; then
           chosen="$(osascript -e "POSIX path of (choose folder with prompt \"$dialog\")" 2>/dev/null)"
           if [ -n "$chosen" ]; then
             CHOSEN_FOLDER="$(normalize_path "$chosen")" && return 0
           fi
           say_ui 'Seleção cancelada ou Finder indisponível. Você também pode usar 2.' 'Selection canceled or Finder unavailable. You can also use option 2.'
-        else say_ui 'Finder indisponível. Escolha 2 para informar o caminho.' 'Finder unavailable. Choose option 2 to enter the path.'; fi
+        else say_ui 'Seletor indisponível. Escolha 2 para informar o caminho.' 'Picker unavailable. Choose option 2 to enter the path.'; fi
         ;;
       2)
         ask_ui 'Caminho da pasta existente (Enter cancela): ' 'Existing folder path (Enter cancels): ' || return 1
@@ -178,7 +203,8 @@ choose_folder() {
 set_project() {
   local canonical key old line temporary count=0
   canonical="$(normalize_path "$1")" || return 1
-  key="$(printf '%s' "$canonical" | shasum -a 256)" || return 1
+  if command -v shasum >/dev/null 2>&1; then key="$(printf '%s' "$canonical" | shasum -a 256)" || return 1
+  else key="$(printf '%s' "$canonical" | sha256sum)" || return 1; fi
   key="${key%% *}"
   PREF_DIR="$STATE_DIR/projects/$key"
   mkdir -p "$PREF_DIR" || return 1
@@ -866,7 +892,7 @@ install_tool() {
   local method url tempdir file status=0
   header "$(ui 'Instalar / atualizar' 'Install / update') · $TOOL"
   say_ui '1) Instalador nativo oficial — não exige Node.js nem Homebrew' '1) Official native installer — no Node.js or Homebrew needed'
-  say_ui '2) Homebrew já instalado' '2) Homebrew already installed'
+  if [ "$PLATFORM" = Darwin ]; then say_ui '2) Homebrew já instalado' '2) Homebrew already installed'; fi
   [ "$TOOL" != codex ] || say_ui '3) npm já instalado (alternativa para Codex)' '3) npm already installed (Codex alternative)'
   say_ui '0) Voltar' '0) Back'
   ask_ui 'Método [1]: ' 'Method [1]: ' || return 1
@@ -887,6 +913,7 @@ install_tool() {
       rm -f "$file"; rmdir "$tempdir" 2>/dev/null
       ;;
     2)
+      [ "$PLATFORM" = Darwin ] || return 1
       command -v brew >/dev/null 2>&1 || { warn "$(ui 'Homebrew não encontrado. Use o instalador nativo (1).' 'Homebrew not found. Use the native installer (1).')"; return 1; }
       local package='codex'
       [ "$TOOL" != claude ] || package='claude-code'
@@ -961,11 +988,12 @@ installation_menu() {
 }
 choose_local_file() {
   local method file
-  say_ui '1) Escolher arquivo no Finder  2) Digitar caminho  0) Voltar' '1) Choose a file in Finder  2) Enter a path  0) Back'
+  say_ui '1) Escolher arquivo  2) Digitar caminho  0) Voltar' '1) Choose a file  2) Enter a path  0) Back'
   ask_ui 'Método [1]: ' 'Method [1]: ' || return 1
   method="${REPLY:-1}"
   case "$method" in
-    1) file="$(osascript -e 'POSIX path of (choose file with prompt "Selecione o arquivo para copiar ao projeto")' 2>/dev/null)" || return 1 ;;
+    1) if [ "$PLATFORM" = Linux ]; then command -v zenity >/dev/null 2>&1 || { warn 'Zenity indisponível. Escolha 2.'; return 1; }; file="$(zenity --file-selection 2>/dev/null)" || return 1
+       else file="$(osascript -e 'POSIX path of (choose file with prompt "Selecione o arquivo para copiar ao projeto")' 2>/dev/null)" || return 1; fi ;;
     2) ask_ui 'Caminho completo do arquivo: ' 'Full file path: ' || return 1
        file="$(expand_path "$REPLY")" || return 1 ;;
     *) return 1 ;;
@@ -1029,7 +1057,10 @@ backup_project() {
   say "$(ui 'Destino' 'Destination'): $dest"
   ask_ui 'Enter para criar a cópia; 0 para cancelar: ' 'Press Enter to create the backup; 0 to cancel: ' || return 1
   [ -z "$REPLY" ] || return 1
-  run_foreground /usr/bin/ditto -c -k --keepParent "$PROJECT" "$dest"; status=$?
+  if [ "$PLATFORM" = Linux ]; then
+    command -v zip >/dev/null 2>&1 || { warn "$(ui 'Instale zip para criar a cópia.' 'Install zip to create the backup.')"; return 1; }
+    (cd "$(dirname "$PROJECT")" && run_foreground zip -qr "$dest" "$(basename "$PROJECT")"); status=$?
+  else run_foreground /usr/bin/ditto -c -k --keepParent "$PROJECT" "$dest"; status=$?; fi
   [ "$status" -eq 0 ] && say "$(ui 'Cópia criada' 'Backup created'): $dest" || warn "$(ui 'Cópia não concluída. Confira a mensagem acima e o arquivo de destino.' 'Backup failed. Check the message above and the destination file.')"
   return "$status"
 }
@@ -1038,10 +1069,10 @@ open_site() {
   ask_ui 'Endereço local (ex.: http://localhost:3000) ou caminho de um arquivo HTML: ' 'Local address (for example, http://localhost:3000) or HTML file path: ' || return 1
   target="$REPLY"
   case "$target" in
-    http://localhost:*|http://127.0.0.1:*|https://localhost:*) open -a Safari "$target" ;;
+    http://localhost:*|http://127.0.0.1:*|https://localhost:*) open_path "$target" ;;
     *)
       [ -f "$target" ] || { warn 'Informe um HTML existente ou a URL local exibida pelo seu servidor.'; return 1; }
-      case "$target" in *.html|*.htm|*.HTML|*.HTM) open -a Safari "$target" ;; *) warn 'Escolha um arquivo HTML.'; return 1 ;; esac ;;
+      case "$target" in *.html|*.htm|*.HTML|*.HTM) open_path "$target" ;; *) warn 'Escolha um arquivo HTML.'; return 1 ;; esac ;;
   esac
 }
 # Descoberta limitada à pasta CODIGO e a um nível de subpastas, sem seguir links.
@@ -1120,7 +1151,7 @@ git_changes() {
     say 'Para instalar, digite no Terminal: xcode-select --install'
     return 0
   fi
-  command -v git >/dev/null 2>&1 || { say_ui 'O Git não foi encontrado neste Mac.' 'Git was not found on this Mac.'; return 0; }
+  command -v git >/dev/null 2>&1 || { say_ui 'O Git não foi encontrado.' 'Git was not found.'; return 0; }
   if [ ! -L "$PROJECT/.git" ] && git -C "$PROJECT" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     (cd "$PROJECT" && git status --short --branch)
     return $?
@@ -1151,14 +1182,14 @@ project_tools() {
     say_ui '12) Verificar se a pasta está organizada' '12) Check project organization'
     say ''
     say_ui 'ARQUIVOS' 'FILES'
-    say_ui ' 1) Abrir a pasta no Finder' ' 1) Open folder in Finder'
+    say_ui ' 1) Abrir a pasta' ' 1) Open folder'
     say_ui ' 2) Copiar um anexo para ANEXOS (imagem, PDF, documento)' ' 2) Copy an attachment to ANEXOS (image, PDF, document)'
     say_ui ' 4) Capturar parte da tela para ANEXOS' ' 4) Capture part of the screen to ANEXOS'
     say ''
     say_ui 'OUTROS' 'OTHER'
     say_ui ' 5) Ver alterações do Git' ' 5) View Git changes'
     say_ui ' 6) Criar uma cópia ZIP do projeto' ' 6) Create a ZIP backup of the project'
-    say_ui ' 7) Abrir o site local no Safari' ' 7) Open local site in Safari'
+    say_ui ' 7) Abrir o site local no navegador' ' 7) Open local site in browser'
     say_ui ' 8) Iniciar o servidor do site (npm run dev)' ' 8) Start the site server (npm run dev)'
     say ''
     say_ui ' 0) Voltar ao menu' ' 0) Back to main menu'
@@ -1166,21 +1197,21 @@ project_tools() {
     choice="$REPLY"
     skip=''
     case "$choice" in
-      1) open "$PROJECT"; skip=1 ;;
+      1) open_path "$PROJECT"; skip=1 ;;
       2) copy_attachment ;;
       3) save_prompt ;;
       4)
         safe_project_path ANEXOS || return 1
         mkdir -p "$PROJECT/ANEXOS" || return 1
         file="$PROJECT/ANEXOS/captura-$(date '+%Y%m%d-%H%M%S')-$RANDOM.png"
-        screencapture -i "$file"
+        capture_screen "$file"
         [ ! -s "$file" ] || say "$(ui 'Captura salva' 'Screenshot saved'): $file" ;;
       5) git_changes ;;
       6) backup_project ;;
       7) open_site ;;
       8) start_dev_server ;;
       9) instructions_menu ;;
-      10) safe_project_path PROMPTS && mkdir -p "$PROJECT/PROMPTS" && open "$PROJECT/PROMPTS"; skip=1 ;;
+      10) safe_project_path PROMPTS && mkdir -p "$PROJECT/PROMPTS" && open_path "$PROJECT/PROMPTS"; skip=1 ;;
       11) organize_project ;;
       12) if type project_doctor >/dev/null 2>&1; then project_doctor; else warn 'Biblioteca de projetos ausente.'; fi ;;
       0) return 0 ;;
@@ -1203,7 +1234,7 @@ show_guide() {
     say ''
     say "Full guide (Portuguese): $BASE_DIR/GUIA-DE-USO.md"
     ask 'Open the full guide in TextEdit? [y/N]: ' || return 1
-    case "$REPLY" in y|Y) open -a TextEdit "$BASE_DIR/GUIA-DE-USO.md" ;; esac
+    case "$REPLY" in y|Y) edit_path "$BASE_DIR/GUIA-DE-USO.md" ;; esac
     return 0
   fi
   header 'Como funciona em 4 passos'
@@ -1218,7 +1249,7 @@ show_guide() {
   say ''
   say "Guia completo: $BASE_DIR/GUIA-DE-USO.md"
   ask 'Abrir o guia completo no TextEdit? [s/N]: ' || return 1
-  case "$REPLY" in s|S) open -a TextEdit "$BASE_DIR/GUIA-DE-USO.md" ;; esac
+  case "$REPLY" in s|S) edit_path "$BASE_DIR/GUIA-DE-USO.md" ;; esac
 }
 resume_menu() {
   say_ui '1) Continuar a última conversa deste projeto' '1) Resume the latest conversation in this project'
@@ -1264,7 +1295,7 @@ panel() {
 }
 screen_title() {
   if [ -t 1 ] && [ "${ASSISTENTE_TEST_MODE:-}" != 1 ]; then printf '\033[2J\033[H'; fi
-  printf '\n%s  ASSISTENTE IA · MAC %s%s\n' "$COLOR" "$VERSION" "$RESET"
+  printf '\n%s  ASSISTENTE IA · %s %s%s\n' "$COLOR" "$PLATFORM_LABEL" "$VERSION" "$RESET"
   printf '  %s\n' "$1"
   rule
 }
@@ -1399,9 +1430,9 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then
   case "${1:-}" in
     --help|-h)
       if [ "$APP_LANG" = en ]; then
-        printf 'Assistente IA Mac %s\n\nDouble-click the launcher or run: /bin/bash ASSISTENTE-IA-MAC.command\n\n--check         Check files and syntax without changing preferences\n--diagnostics   Show versions and sign-in status (read-only)\n--rtk          Open the RTK menu\n--rtk status   Show installation and integrations\n--rtk gain     Show estimated savings\n--rtk history  Show recent recorded operations\n--rtk verify   Test command rewriting without running commands\n--rtk monitor  Open the live monitor in this Terminal\n--rtk update   Check for a new RTK version and update after confirmation\n--rtk enable codex|claude     Configure integration after confirmation\n--rtk disable codex|claude    Remove integration after confirmation\n' "$VERSION"
+        printf 'Assistente IA %s %s\n\nRun: bash ASSISTENTE-IA-%s.%s\n\n--check         Check files and syntax without changing preferences\n--diagnostics   Show versions and sign-in status (read-only)\n--rtk          Open the RTK menu\n--rtk status   Show installation and integrations\n--rtk gain     Show estimated savings\n--rtk history  Show recent recorded operations\n--rtk verify   Test command rewriting without running commands\n--rtk monitor  Open the live monitor in this Terminal\n--rtk update   Check for a new RTK version and update after confirmation\n--rtk enable codex|claude     Configure integration after confirmation\n--rtk disable codex|claude    Remove integration after confirmation\n' "$PLATFORM_LABEL" "$VERSION" "$PLATFORM_LABEL" "$([ "$PLATFORM" = Linux ] && printf sh || printf command)"
       else
-        printf 'Assistente IA Mac %s\n\nAbra com dois cliques ou execute: /bin/bash ASSISTENTE-IA-MAC.command\n\n--check         Confere arquivos e sintaxe sem alterar preferências\n--diagnostico   Mostra versões e situação do login (somente leitura)\n--rtk          Abre o menu RTK\n--rtk status   Mostra instalação e integrações\n--rtk ganhos   Mostra economia estimada\n--rtk historico   Exibe últimas operações registradas\n--rtk verificar   Testa o mecanismo de reescrita sem executar comandos\n--rtk monitor    Abre monitor ao vivo neste terminal\n--rtk atualizar  Procura versão nova do RTK e atualiza, após confirmação\n--rtk ativar codex|claude       Configura integração, após confirmação\n--rtk desativar codex|claude    Remove integração, após confirmação\n' "$VERSION"
+        printf 'Assistente IA %s %s\n\nExecute: bash ASSISTENTE-IA-%s.%s\n\n--check         Confere arquivos e sintaxe sem alterar preferências\n--diagnostico   Mostra versões e situação do login (somente leitura)\n--rtk          Abre o menu RTK\n--rtk status   Mostra instalação e integrações\n--rtk ganhos   Mostra economia estimada\n--rtk historico   Exibe últimas operações registradas\n--rtk verificar   Testa o mecanismo de reescrita sem executar comandos\n--rtk monitor    Abre monitor ao vivo neste terminal\n--rtk atualizar  Procura versão nova do RTK e atualiza, após confirmação\n--rtk ativar codex|claude       Configura integração, após confirmação\n--rtk desativar codex|claude    Remove integração, após confirmação\n' "$PLATFORM_LABEL" "$VERSION" "$PLATFORM_LABEL" "$([ "$PLATFORM" = Linux ] && printf sh || printf command)"
       fi
       exit 0 ;;
     --check)
