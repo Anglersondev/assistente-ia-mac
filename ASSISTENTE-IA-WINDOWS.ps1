@@ -1,7 +1,7 @@
 ﻿param([switch]$Check, [switch]$Help)
 $ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-$version = '1.1'
+$version = '1.0'
 $state = if ($env:ASSISTENTE_STATE_DIR) { $env:ASSISTENTE_STATE_DIR } else { Join-Path $env:LOCALAPPDATA 'Assistente IA' }
 $langFile = Join-Path $state 'language'
 $script:lang = if ($env:ASSISTENTE_LANG -in @('en', 'pt-BR')) { $env:ASSISTENTE_LANG } elseif (Test-Path -LiteralPath $langFile) { (Get-Content -LiteralPath $langFile -TotalCount 1 -Encoding UTF8).Trim() } elseif ([Globalization.CultureInfo]::CurrentUICulture.Name -like 'en*') { 'en' } else { 'pt-BR' }

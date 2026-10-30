@@ -1,7 +1,7 @@
 #!/bin/bash
-# Assistente IA 1.1 — compatível com o Bash 3.2 do macOS e Bash no Linux.
+# Assistente IA 1.0 — compatível com o Bash 3.2 do macOS e Bash no Linux.
 # Arquivos de preferências são dados, nunca código. Os CLIs conservam o terminal.
-VERSION='1.1'
+VERSION='1.0'
 BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 PLATFORM="${ASSISTENTE_PLATFORM:-$(uname -s)}"
 case "$PLATFORM" in Linux|linux) PLATFORM=Linux; PLATFORM_LABEL=LINUX; DEFAULT_STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/assistente-ia" ;; *) PLATFORM=Darwin; PLATFORM_LABEL=MAC; DEFAULT_STATE_DIR="$HOME/Library/Application Support/Assistente IA Mac" ;; esac

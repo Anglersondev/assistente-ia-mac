@@ -8,9 +8,9 @@
 
 # Assistente IA — assistente para macOS, Linux e Windows
 
-## Linux e Windows (versão 1.1)
+## Linux e Windows (versão 1.0)
 
-Os lançadores para Linux e Windows estão na [prévia da versão 1.1](https://github.com/Anglersondev/assistente-ia-mac/archive/refs/heads/feature/linux-windows-1.1.zip). A última release publicada ainda é o kit macOS 1.0.
+Os lançadores para Linux e Windows estão na [prévia multiplataforma 1.0](https://github.com/Anglersondev/assistente-ia-mac/archive/refs/heads/feature/linux-windows-1.0.zip). A release 1.0 publicada ainda contém o kit macOS.
 
 | Sistema | Como abrir | Requisitos |
 | --- | --- | --- |
