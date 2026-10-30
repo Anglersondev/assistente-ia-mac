@@ -10,7 +10,7 @@
 
 ## Linux e Windows (versão 1.0)
 
-Os lançadores para Linux e Windows estão na [prévia multiplataforma 1.0](https://github.com/Anglersondev/assistente-ia-mac/archive/refs/heads/feature/linux-windows-1.0.zip). A release 1.0 publicada ainda contém o kit macOS.
+Baixe o ZIP para macOS, Linux ou Windows na [release da versão 1.0](https://github.com/Anglersondev/assistente-ia-mac/releases/tag/v1.0).
 
 | Sistema | Como abrir | Requisitos |
 | --- | --- | --- |

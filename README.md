@@ -24,7 +24,7 @@
 
 ## Choose your system
 
-The Linux and Windows launchers are available in the [cross-platform 1.0 preview](https://github.com/Anglersondev/assistente-ia-mac/archive/refs/heads/feature/linux-windows-1.0.zip). The published 1.0 release currently contains the macOS kit.
+Download the macOS, Linux or Windows ZIP from the [version 1.0 release](https://github.com/Anglersondev/assistente-ia-mac/releases/tag/v1.0).
 
 | System | Launcher | Requirements |
 | --- | --- | --- |
