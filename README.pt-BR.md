@@ -6,6 +6,12 @@
   Organize projetos, mantenha o contexto junto do código e use Codex CLI ou Claude Code em um único menu.
 </div>
 
+# Assistente IA Mac — assistente de IA para macOS com Codex CLI e Claude Code
+
+**Um ambiente bilíngue no Terminal para desenvolver com IA no Mac.** Organize projetos, reutilize prompts, retome conversas, confira alterações Git e inicie servidores locais em um menu. Na primeira abertura, o programa detecta inglês ou português do Brasil no macOS; você pode salvar outra escolha.
+
+**[Baixar a versão mais recente](https://github.com/Anglersondev/assistente-ia-mac/releases/latest)** · [Como começar](#comece-em-quatro-passos) · [English](README.md)
+
 ---
 
 **Idiomas:** [English](README.md) · Português (Brasil)
